@@ -15,9 +15,7 @@
       --font-main: "Consolas", "Courier New", monospace;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html, body {
       margin: 0;
@@ -70,31 +68,70 @@
       overflow: hidden;
     }
 
-    .terminal::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        linear-gradient(120deg,
-          rgba(0, 255, 127, 0.12),
-          transparent 40%,
-          transparent 60%,
-          rgba(0, 255, 127, 0.12)
-        );
-      mix-blend-mode: soft-light;
-      opacity: 0.7;
-      pointer-events: none;
-    }
-
     .terminal-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 1.25rem;
-      position: relative;
-      z-index: 1;
     }
 
+    .terminal-status {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--fg);
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #00ff7f;
+      box-shadow: 0 0 8px rgba(0, 255, 127, 0.8);
+      animation: netPulse 1.4s infinite;
+    }
+
+    @keyframes netPulse {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
+    }
+
+    .status-offline {
+      background: #ff3b3b !important;
+      box-shadow: 0 0 8px rgba(255, 0, 0, 0.8) !important;
+    }
+
+    .ghost-route {
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      height: 70px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      border-left: 2px solid var(--accent);
+      padding-left: 0.5rem;
+      opacity: 0.85;
+    }
+
+    .net-metrics {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      color: var(--fg-muted);
+      margin-top: 0.3rem;
+    }
+
+    #boot-sequence {
+      font-size: 0.75rem;
+      letter-spacing: 0.14em;
+      color: var(--fg-muted);
+      margin-bottom: 1rem;
+    }
+
+    /* Original styles continue… */
     .terminal-lights {
       display: flex;
       gap: 0.35rem;
@@ -105,9 +142,7 @@
       height: 8px;
       border-radius: 50%;
       background: #1b2a23;
-      box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
       position: relative;
-      overflow: hidden;
     }
 
     .light.red::after {
@@ -116,7 +151,6 @@
       inset: 1px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #ff7777, #ff0000);
-      opacity: 0.8;
     }
 
     .light.yellow::after {
@@ -125,7 +159,6 @@
       inset: 1px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #fff099, #ffcc00);
-      opacity: 0.8;
     }
 
     .light.green::after {
@@ -134,7 +167,6 @@
       inset: 1px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #9fffaf, #00ff7f);
-      opacity: 0.9;
     }
 
     .terminal-title {
@@ -145,52 +177,11 @@
       text-align: right;
     }
 
-    .terminal-body {
-      position: relative;
-      z-index: 1;
-    }
-
-    .mono-small {
-      font-size: 0.72rem;
-      color: var(--fg-muted);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      margin-bottom: 0.75rem;
-    }
-
-    .status-line {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.68rem;
-      color: var(--fg-muted);
-      margin-bottom: 0.75rem;
-    }
-
-    .status-line span:last-child {
-      color: var(--accent);
-    }
-
     .banner {
       border: 1px solid #06351d;
       background: radial-gradient(circle at top left, #04110a 0, #020604 55%, #000 100%);
       padding: 0.9rem;
       margin-bottom: 1.25rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .banner::after {
-      content: "CLASSIFIED";
-      position: absolute;
-      top: -0.4rem;
-      right: -3.5rem;
-      transform: rotate(18deg);
-      font-size: 0.55rem;
-      letter-spacing: 0.24em;
-      color: rgba(0, 255, 127, 0.28);
-      border: 1px solid rgba(0, 255, 127, 0.4);
-      padding: 0.3rem 2.8rem;
-      text-align: center;
     }
 
     .banner-title {
@@ -207,13 +198,7 @@
       letter-spacing: 0.06em;
     }
 
-    .login-form {
-      margin-top: 0.5rem;
-    }
-
-    .field-group {
-      margin-bottom: 0.85rem;
-    }
+    .field-group { margin-bottom: 0.85rem; }
 
     .field-label {
       font-size: 0.68rem;
@@ -239,7 +224,6 @@
       transform: translateY(-50%);
       font-size: 0.75rem;
       color: var(--fg-muted);
-      pointer-events: none;
     }
 
     .field-input {
@@ -247,70 +231,32 @@
       padding: 0.45rem 0.45rem 0.45rem 1.3rem;
       background: transparent;
       border: none;
-      outline: none;
       color: var(--fg);
       font-family: var(--font-main);
       font-size: 0.8rem;
-      letter-spacing: 0.08em;
     }
 
-    .field-input::placeholder {
-      color: #02552f;
-    }
-
-    .field-input:focus {
-      outline: none;
-    }
-
-    .meta-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 0.35rem;
-      margin-bottom: 0.75rem;
-      font-size: 0.68rem;
-      color: var(--fg-muted);
-    }
-
-    .checkbox {
+    .hardware-key-shell {
+      padding: 0.55rem 0.75rem;
       display: flex;
       align-items: center;
-      gap: 0.35rem;
-      cursor: pointer;
-      user-select: none;
+      border: 1px solid #0d5a30;
+      background: #010302;
+      box-shadow: inset 0 0 0 1px #020804;
+      margin-bottom: 0.5rem;
     }
 
-    .checkbox-square {
-      width: 10px;
-      height: 10px;
-      border: 1px solid #0c4c27;
-      background: #010402;
-      box-shadow: inset 0 0 0 1px #000;
-      position: relative;
-    }
-
-    .checkbox input {
-      display: none;
-    }
-
-    .checkbox input:checked + .checkbox-square::after {
-      content: "";
-      position: absolute;
-      inset: 1px;
-      background: var(--fg);
-      box-shadow: 0 0 4px rgba(0, 255, 127, 0.7);
-    }
-
-    .meta-token {
+    .hardware-status {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
       color: var(--accent);
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
+      animation: pulse 1.6s infinite;
     }
 
-    .btn-row {
-      display: flex;
-      gap: 0.6rem;
-      margin-top: 0.4rem;
+    @keyframes pulse {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
     }
 
     .btn {
@@ -324,204 +270,204 @@
       letter-spacing: 0.16em;
       text-transform: uppercase;
       cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.05s ease;
-    }
-
-    .btn::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(120deg,
-        transparent 0%,
-        rgba(0, 255, 127, 0.18) 40%,
-        transparent 70%);
-      opacity: 0;
-      transition: opacity 0.18s ease;
-      pointer-events: none;
     }
 
     .btn-primary {
       border-color: #00ff7f;
-      box-shadow:
-        0 0 10px rgba(0, 255, 127, 0.18),
-        inset 0 0 0 1px #062915;
+      box-shadow: 0 0 10px rgba(0, 255, 127, 0.18);
     }
 
-    .btn-secondary {
-      color: var(--fg-muted);
-      border-style: dashed;
-      border-color: #0b3a21;
-    }
-
-    .btn:hover {
-      background: linear-gradient(to bottom, #062413, #040c07);
-      box-shadow:
-        0 0 14px rgba(0, 255, 127, 0.3),
-        inset 0 0 0 1px #08361c;
-    }
-
-    .btn:hover::after {
-      opacity: 1;
-    }
-
-    .btn:active {
-      transform: translateY(1px);
-      box-shadow:
-        0 0 8px rgba(0, 255, 127, 0.1),
-        inset 0 0 0 1px #03140a;
-    }
-
-    .footer {
-      margin-top: 1rem;
-      border-top: 1px solid #04150b;
-      padding-top: 0.5rem;
-      font-size: 0.66rem;
-      color: var(--fg-muted);
-    }
-
-    .footer-line {
+    .btn-row {
       display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.15rem;
-    }
-
-    .footer-line span:last-child {
-      color: #ffcc00;
-    }
-
-    .warning {
-      color: var(--danger);
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
+      gap: 0.6rem;
       margin-top: 0.4rem;
-      font-size: 0.64rem;
-    }
-
-    .cursor {
-      display: inline-block;
-      width: 0.55ch;
-      height: 0.8em;
-      background: var(--fg);
-      margin-left: 0.1rem;
-      animation: blink 1s step-start infinite;
-      vertical-align: text-bottom;
-    }
-
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
-
-    @media (max-width: 480px) {
-      .terminal {
-        padding: 1.1rem 1.1rem 1.5rem;
-      }
-
-      .banner::after {
-        display: none;
-      }
     }
   </style>
 </head>
+
 <body>
   <div class="scanline"></div>
 
   <div class="terminal-wrapper">
     <div class="terminal">
+
+      <!-- HEADER -->
       <div class="terminal-header">
         <div class="terminal-lights">
           <div class="light red"></div>
           <div class="light yellow"></div>
           <div class="light green"></div>
         </div>
+
         <div class="terminal-title">
           OMEGA NODE // ACCESS GATEWAY
         </div>
+
+        <div class="terminal-status">
+          <span class="status-dot" id="net-dot"></span>
+          <span id="net-text">ONLINE</span>
+        </div>
       </div>
 
-      <div class="terminal-body">
-        <div class="mono-small">
-          INIT SECURE SESSION_01 / AUTH CHANNEL: ENCRYPTED
-        </div>
+      <!-- BOOT SEQUENCE -->
+      <div id="boot-sequence"></div>
 
-        <div class="status-line">
-          <span>ROUTE: GHOST-NET/BLACK-CHANNEL</span>
-          <span>STATUS: <strong>STANDBY</strong></span>
+      <!-- LOGIN CONTAINER (hidden until boot completes) -->
+      <div id="login-container" style="display:none;">
+
+        <!-- Ghost Node Routing -->
+        <div class="ghost-route" id="ghost-route"></div>
+
+        <!-- Network Metrics -->
+        <div class="net-metrics">
+          LATENCY: <span id="latency-val">-- ms</span><br>
+          PACKET LOSS: <span id="loss-val">--%</span>
         </div>
 
         <div class="banner">
-          <div class="banner-title">
-            ██ RESTRICTED ACCESS LOGIN NODE ██
-          </div>
-          <div class="banner-subtitle">
-            UNAUTHORIZED ACCESS IS PROHIBITED AND WILL BE TRACED
-          </div>
+          <div class="banner-title">██ RESTRICTED ACCESS LOGIN NODE ██</div>
+          <div class="banner-subtitle">UNAUTHORIZED ACCESS IS PROHIBITED AND WILL BE TRACED</div>
         </div>
 
         <form class="login-form" autocomplete="off">
           <div class="field-group">
-            <label class="field-label">Agent id</label>
+            <label class="field-label">Agent ID</label>
             <div class="field-shell">
-              <input
-                class="field-input"
-                type="text"
-                name="agent"
-                spellcheck="false"
-                autocomplete="off"
-                autofocus
-                placeholder="ENTER CREDENTIAL STRING"
-              />
+              <input class="field-input" type="text" placeholder="ENTER CREDENTIAL STRING">
             </div>
           </div>
 
           <div class="field-group">
-            <label class="field-label">Cipher key</label>
+            <label class="field-label">Cipher Key</label>
             <div class="field-shell">
-              <input
-                class="field-input"
-                type="password"
-                name="key"
-                autocomplete="off"
-                placeholder="ENTER AUTHORIZATION KEY"
-              />
+              <input class="field-input" type="password" placeholder="ENTER AUTHORIZATION KEY">
             </div>
           </div>
 
-          <div class="meta-row">
-            <label class="checkbox">
-              <input type="checkbox" />
-              <span class="checkbox-square"></span>
-              <span>Maintain shadow session</span>
-            </label>
-            <span class="meta-token">PROTOCOL: AURORA-13</span>
+          <!-- Hardware Key -->
+          <div class="field-group">
+            <label class="field-label">Hardware Security Key</label>
+            <div class="hardware-key-shell">
+              <span class="hardware-status" id="hw-status">AWAITING DEVICE INSERTION...</span>
+            </div>
+            <button class="btn btn-primary" type="button" id="hw-init">Initiate Key Challenge</button>
           </div>
 
           <div class="btn-row">
-            <button class="btn btn-primary" type="submit">
-              Engage access
-            </button>
-            <button class="btn btn-secondary" type="button">
-              Wipe trace
-            </button>
-          </div>
-
-          <div class="footer">
-            <div class="footer-line">
-              <span>LOG CHANNEL:</span>
-              <span>SEGMENT-07: BLACK ICE</span>
-            </div>
-            <div class="footer-line">
-              <span>LAST BREACH ATTEMPT:</span>
-              <span>FAILED // SOURCE MASKED</span>
-            </div>
-            <div class="warning">
-              ALL EVENTS ARE MONITORED<span class="cursor"></span>
-            </div>
+            <button class="btn btn-primary" type="submit">Engage Access</button>
+            <button class="btn" type="button">Wipe Trace</button>
           </div>
         </form>
       </div>
     </div>
   </div>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    // ONLINE STATUS
+    function updateStatus() {
+      const dot = document.getElementById("net-dot");
+      const text = document.getElementById("net-text");
+
+      if (navigator.onLine) {
+        dot.classList.remove("status-offline");
+        text.textContent = "ONLINE";
+        text.style.color = "#00ff7f";
+      } else {
+        dot.classList.add("status-offline");
+        text.textContent = "OFFLINE";
+        text.style.color = "#ff3b3b";
+      }
+    }
+    window.addEventListener("online", updateStatus);
+    window.addEventListener("offline", updateStatus);
+    updateStatus();
+
+    // LATENCY
+    function updateLatency() {
+      const latency = Math.floor(Math.random() * 120) + 20;
+      document.getElementById("latency-val").textContent = latency + " ms";
+    }
+    setInterval(updateLatency, 1500);
+    updateLatency();
+
+    // PACKET LOSS
+    function updatePacketLoss() {
+      const loss = (Math.random() * 3).toFixed(1);
+      document.getElementById("loss-val").textContent = loss + "%";
+    }
+    setInterval(updatePacketLoss, 2000);
+    updatePacketLoss();
+
+    // GHOST NODE ROUTING
+    const nodes = [
+      "NODE-01 // SHADOW RELAY",
+      "NODE-14 // GHOST MIRROR",
+      "NODE-22 // DARK FIBER",
+      "NODE-37 // ICEBOUND EXIT",
+      "NODE-44 // NULL ROUTER",
+      "NODE-51 // PHANTOM GATE",
+      "NODE-63 // BLACKSTAR UPLINK"
+    ];
+    let idx = 0;
+
+    function cycleNodes() {
+      const box = document.getElementById("ghost-route");
+      const line = document.createElement("div");
+      line.textContent = "ROUTING → " + nodes[idx % nodes.length];
+      box.appendChild(line);
+
+      if (box.children.length > 5) {
+        box.removeChild(box.children[0]);
+      }
+      idx++;
+    }
+    setInterval(cycleNodes, 900);
+    cycleNodes();
+
+    // HARDWARE KEY SIMULATION
+    document.getElementById("hw-init").addEventListener("click", () => {
+      const status = document.getElementById("hw-status");
+      status.textContent = "DETECTING SECURITY TOKEN...";
+      status.style.color = "#ffcc00";
+
+      setTimeout(() => {
+        status.textContent = "KEY DETECTED // READY FOR CHALLENGE";
+        status.style.color = "#00ff7f";
+      }, 1500);
+    });
+
+    // BOOT SEQUENCE
+    const bootLines = [
+      "INITIALIZING OMEGA NODE KERNEL...",
+      "LOADING SECURE MODULES...",
+      "MOUNTING ENCRYPTED VOLUMES...",
+      "SPAWNING SHADOW PROCESSES...",
+      "ESTABLISHING GHOST-NET LINK...",
+      "VERIFYING INTEGRITY CHANNELS...",
+      "BOOT COMPLETE // READY"
+    ];
+
+    let bootIndex = 0;
+
+    function runBoot() {
+      const bootBox = document.getElementById("boot-sequence");
+      const line = document.createElement("div");
+      line.textContent = bootLines[bootIndex];
+      bootBox.appendChild(line);
+
+      bootIndex++;
+
+      if (bootIndex < bootLines.length) {
+        setTimeout(runBoot, 550);
+      } else {
+        setTimeout(() => {
+          bootBox.style.display = "none";
+          document.getElementById("login-container").style.display = "block";
+        }, 600);
+      }
+    }
+    runBoot();
+  </script>
 </body>
 </html>
