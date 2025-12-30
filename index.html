@@ -1,204 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>H4CK Interface</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Secure Access Terminal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
-      --bg: #02030a;
-      --accent: #00ff9c;
-      --accent-soft: rgba(0, 255, 156, 0.2);
+      --bg: #020405;
+      --fg: #00ff7f;
+      --fg-muted: #00b35a;
       --danger: #ff3b3b;
-      --text-soft: #8affd3;
-      --border: #0a1f16;
-      --shadow: 0 0 20px rgba(0, 255, 156, 0.35);
+      --accent: #00e0ff;
+      --border: #0a2a1a;
+      --font-main: "Consolas", "Courier New", monospace;
     }
 
     * {
       box-sizing: border-box;
-      font-family: "SF Mono", "Consolas", "Fira Code", monospace;
     }
 
-    body {
+    html, body {
       margin: 0;
-      min-height: 100vh;
-      background: radial-gradient(circle at top, #041529 0, #02030a 40%, #000000 100%);
-      color: #d8ffe9;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at top, #04100a 0, #020405 40%, #000000 100%);
+      color: var(--fg);
+      font-family: var(--font-main);
+      overflow: hidden;
+    }
+
+    .scanline {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.25) 0px,
+        rgba(0, 0, 0, 0.25) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      mix-blend-mode: soft-light;
+      opacity: 0.7;
+      z-index: 2;
+    }
+
+    .terminal-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
-      overflow: hidden;
-    }
-
-    .scanlines::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.3) 1px,
-        transparent 1px
-      );
-      background-size: 100% 3px;
-      mix-blend-mode: soft-light;
-      opacity: 0.35;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .noise {
-      position: fixed;
-      inset: -40px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='noStitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E");
-      mix-blend-mode: soft-light;
-      opacity: 0.6;
-      pointer-events: none;
-      z-index: 0;
-      animation: noiseShift 8s infinite linear alternate;
-    }
-
-    @keyframes noiseShift {
-      from {
-        transform: translate3d(0, 0, 0);
-      }
-      to {
-        transform: translate3d(-60px, -40px, 0);
-      }
-    }
-
-    .frame {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      max-width: 1100px;
-      border: 1px solid var(--border);
-      background: rgba(0, 4, 3, 0.9);
-      box-shadow: var(--shadow);
-      border-radius: 10px;
-      overflow: hidden;
-      display: grid;
-      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-      backdrop-filter: blur(8px);
-    }
-
-    @media (max-width: 880px) {
-      .frame {
-        grid-template-columns: 1fr;
-        max-width: 100%;
-      }
-    }
-
-    .frame-header {
-      grid-column: 1 / -1;
-      padding: 8px 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-bottom: 1px solid var(--border);
-      background: radial-gradient(circle at left, #06281b 0, rgba(0, 0, 0, 0.9) 55%);
-      font-size: 12px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--text-soft);
-    }
-
-    .dots {
-      display: flex;
-      gap: 6px;
-    }
-
-    .dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: #151a15;
-      box-shadow: 0 0 0 1px #0a0f0a;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .dot::after {
-      content: "";
-      position: absolute;
-      inset: 1px;
-      border-radius: inherit;
-      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.23), transparent 60%);
-      opacity: 0.8;
-    }
-
-    .dot.red { background: linear-gradient(145deg, #ff4b4b, #b01010); }
-    .dot.yellow { background: linear-gradient(145deg, #ffd84b, #b18b10); }
-    .dot.green { background: linear-gradient(145deg, #36ff6b, #0f9c33); }
-
-    .frame-header-title {
-      flex: 1;
-      text-align: center;
-      opacity: 0.9;
-    }
-
-    .frame-header-status {
-      font-size: 11px;
-      text-transform: none;
-      opacity: 0.8;
-    }
-
-    .status-dot {
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 8px var(--accent);
-      margin-right: 4px;
-      vertical-align: middle;
-    }
-
-    .panel {
-      padding: 20px 22px 22px;
-      border-right: 1px solid var(--border);
-    }
-
-    @media (max-width: 880px) {
-      .panel {
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-      }
-    }
-
-    .panel:last-child {
-      border-right: none;
-      border-bottom: none;
-    }
-
-    .panel-title {
-      font-size: 13px;
-      letter-spacing: 0.17em;
-      text-transform: uppercase;
-      color: var(--text-soft);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .panel-title span {
-      font-size: 11px;
-      opacity: 0.7;
-      text-transform: none;
-      letter-spacing: 0.05em;
+      padding: 2rem;
     }
 
     .terminal {
-      background: radial-gradient(circle at top left, rgba(0, 255, 156, 0.07) 0, rgba(0, 0, 0, 0.95) 52%, #000 100%);
-      border-radius: 8px;
-      border: 1px solid rgba(0, 255, 156, 0.16);
-      padding: 14px 14px 12px;
-      font-size: 12px;
-      color: var(--text-soft);
-      box-shadow: 0 0 0 1px rgba(0, 255, 156, 0.05);
       position: relative;
+      width: 100%;
+      max-width: 420px;
+      background: rgba(0, 0, 0, 0.88);
+      border: 1px solid var(--border);
+      box-shadow:
+        0 0 0 1px #001407,
+        0 0 30px rgba(0, 0, 0, 0.9),
+        0 0 60px rgba(0, 255, 127, 0.15);
+      padding: 1.5rem 1.75rem 2rem;
       overflow: hidden;
     }
 
@@ -206,767 +74,454 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(
-        120deg,
-        rgba(0, 255, 156, 0.09),
-        transparent 25%,
-        transparent 75%,
-        rgba(0, 255, 156, 0.05)
-      );
+      background:
+        linear-gradient(120deg,
+          rgba(0, 255, 127, 0.12),
+          transparent 40%,
+          transparent 60%,
+          rgba(0, 255, 127, 0.12)
+        );
       mix-blend-mode: soft-light;
+      opacity: 0.7;
       pointer-events: none;
-      opacity: 0;
-      animation: terminalGlow 4.8s infinite ease-in-out;
     }
 
-    @keyframes terminalGlow {
-      0%, 100% { opacity: 0; }
-      30% { opacity: 1; }
-    }
-
-    .terminal-line {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .terminal-prefix {
-      color: var(--accent);
-    }
-
-    .terminal-muted {
-      opacity: 0.7;
-    }
-
-    .terminal-log {
-      margin-top: 6px;
-      max-height: 120px;
-      overflow: hidden;
+    .terminal-header {
       display: flex;
-      flex-direction: column-reverse;
-      gap: 1px;
-      font-size: 11px;
-    }
-
-    .terminal-log-line {
-      opacity: 0.65;
-    }
-
-    .terminal-log-line span {
-      color: var(--accent);
-    }
-
-    .section-label {
-      margin-top: 18px;
-      font-size: 11px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--text-soft);
-      opacity: 0.7;
-    }
-
-    form {
-      margin-top: 10px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px 12px;
-      font-size: 12px;
-    }
-
-    form .full {
-      grid-column: 1 / -1;
-    }
-
-    label {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      font-size: 10px;
-      color: var(--text-soft);
-    }
-
-    input {
-      background: rgba(0, 0, 0, 0.7);
-      border-radius: 4px;
-      border: 1px solid rgba(0, 255, 156, 0.25);
-      padding: 7px 9px;
-      color: #e9fff5;
-      font-size: 12px;
-      outline: none;
-      transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease, transform 0.06s ease;
-    }
-
-    input::placeholder {
-      color: rgba(185, 255, 225, 0.27);
-      font-size: 11px;
-    }
-
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(0, 255, 156, 0.35);
-      background: rgba(0, 20, 10, 0.95);
-      transform: translateY(-0.5px);
-    }
-
-    input.error {
-      border-color: var(--danger);
-      box-shadow: 0 0 0 1px rgba(255, 59, 59, 0.5);
-      background: rgba(30, 0, 0, 0.85);
-    }
-
-    .btn-row {
-      grid-column: 1 / -1;
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    button {
-      border-radius: 4px;
-      border: 1px solid rgba(0, 255, 156, 0.4);
-      padding: 7px 12px;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      background: radial-gradient(circle at top, rgba(0, 255, 156, 0.25), rgba(0, 0, 0, 0.85));
-      color: #e5fff3;
-      cursor: pointer;
-      display: inline-flex;
       align-items: center;
-      gap: 6px;
-      transition: transform 0.08s ease, box-shadow 0.12s ease, border-color 0.12s ease, background-color 0.14s ease;
-      box-shadow: 0 0 12px rgba(0, 255, 156, 0.22);
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      position: relative;
+      z-index: 1;
     }
 
-    button span.icon {
-      font-size: 12px;
-      color: var(--accent);
+    .terminal-lights {
+      display: flex;
+      gap: 0.35rem;
     }
 
-    button.secondary {
-      background: rgba(0, 0, 0, 0.8);
-      border-color: rgba(0, 255, 156, 0.25);
-      box-shadow: none;
-      color: var(--text-soft);
+    .light {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #1b2a23;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
     }
 
-    button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 18px rgba(0, 255, 156, 0.4);
-      border-color: var(--accent);
+    .light.red::after {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ff7777, #ff0000);
+      opacity: 0.8;
     }
 
-    button:active {
-      transform: translateY(0);
-      box-shadow: 0 0 10px rgba(0, 255, 156, 0.3);
+    .light.yellow::after {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff099, #ffcc00);
+      opacity: 0.8;
     }
 
-    button.secondary:hover {
-      box-shadow: 0 0 12px rgba(0, 255, 156, 0.25);
+    .light.green::after {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #9fffaf, #00ff7f);
+      opacity: 0.9;
     }
 
-    .hint {
-      margin-top: 6px;
-      font-size: 10px;
-      color: rgba(173, 255, 220, 0.7);
+    .terminal-title {
+      font-size: 0.74rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      letter-spacing: 0.11em;
+      color: var(--fg-muted);
+      text-align: right;
     }
 
-    .hint span {
-      color: var(--accent);
+    .terminal-body {
+      position: relative;
+      z-index: 1;
     }
 
-    .divider {
-      height: 1px;
-      background: linear-gradient(
-        to right,
-        transparent,
-        rgba(0, 255, 156, 0.4),
-        transparent
-      );
-      margin: 12px 0 10px;
-      opacity: 0.6;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border-radius: 999px;
-      padding: 4px 9px;
-      border: 1px solid rgba(0, 255, 156, 0.35);
-      font-size: 10px;
+    .mono-small {
+      font-size: 0.72rem;
+      color: var(--fg-muted);
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--text-soft);
-      background: radial-gradient(circle at top, rgba(0, 255, 156, 0.15), rgba(0, 0, 0, 0.95));
-    }
-
-    .badge-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 6px rgba(0, 255, 156, 0.8);
-    }
-
-    .mock-warning {
-      margin-top: 10px;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.13em;
-      color: rgba(255, 200, 150, 0.85);
-      background: rgba(25, 12, 0, 0.7);
-      border-radius: 4px;
-      border: 1px dashed rgba(255, 180, 100, 0.55);
-      padding: 6px 8px;
-    }
-
-    .mock-warning span {
-      color: rgba(255, 236, 200, 0.95);
-    }
-
-    .status-feed {
-      margin-top: 10px;
-      font-size: 11px;
-      line-height: 1.5;
-      color: rgba(190, 255, 225, 0.9);
-      max-height: 160px;
-      overflow-y: auto;
-      padding-right: 4px;
+      margin-bottom: 0.75rem;
     }
 
     .status-line {
       display: flex;
-      align-items: baseline;
-      gap: 8px;
-      margin-bottom: 3px;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      color: var(--fg-muted);
+      margin-bottom: 0.75rem;
     }
 
-    .status-label {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: rgba(140, 255, 210, 0.75);
-      min-width: 70px;
-    }
-
-    .status-text {
-      flex: 1;
-      color: rgba(215, 255, 240, 0.9);
-    }
-
-    .status-text span {
+    .status-line span:last-child {
       color: var(--accent);
     }
 
-    .glitch-title {
-      font-size: 18px;
-      letter-spacing: 0.24em;
-      text-transform: uppercase;
-      color: #e8fff5;
-      margin-bottom: 4px;
+    .banner {
+      border: 1px solid #06351d;
+      background: radial-gradient(circle at top left, #04110a 0, #020604 55%, #000 100%);
+      padding: 0.9rem;
+      margin-bottom: 1.25rem;
       position: relative;
-      display: inline-block;
-      text-shadow:
-        0 0 4px rgba(0, 255, 156, 0.8),
-        0 0 14px rgba(0, 255, 156, 0.4),
-        0 0 30px rgba(0, 255, 156, 0.3);
-      animation: titlePulse 3.4s infinite ease-in-out;
+      overflow: hidden;
     }
 
-    @keyframes titlePulse {
-      0%, 100% { text-shadow:
-                    0 0 2px rgba(0, 255, 156, 0.7),
-                    0 0 10px rgba(0, 255, 156, 0.3); }
-      45% { text-shadow:
-                    0 0 6px rgba(0, 255, 156, 1),
-                    0 0 24px rgba(0, 255, 156, 0.6),
-                    0 0 36px rgba(0, 255, 156, 0.5); }
+    .banner::after {
+      content: "CLASSIFIED";
+      position: absolute;
+      top: -0.4rem;
+      right: -3.5rem;
+      transform: rotate(18deg);
+      font-size: 0.55rem;
+      letter-spacing: 0.24em;
+      color: rgba(0, 255, 127, 0.28);
+      border: 1px solid rgba(0, 255, 127, 0.4);
+      padding: 0.3rem 2.8rem;
+      text-align: center;
     }
 
-    .glitch-sub {
-      font-size: 11px;
-      color: rgba(167, 255, 216, 0.85);
+    .banner-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 0.45rem;
+      color: var(--fg);
+    }
+
+    .banner-subtitle {
+      font-size: 0.7rem;
+      color: var(--fg-muted);
+      letter-spacing: 0.06em;
+    }
+
+    .login-form {
+      margin-top: 0.5rem;
+    }
+
+    .field-group {
+      margin-bottom: 0.85rem;
+    }
+
+    .field-label {
+      font-size: 0.68rem;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      margin-bottom: 18px;
+      color: var(--fg-muted);
+      margin-bottom: 0.25rem;
+      display: block;
     }
 
-    .tag-row {
+    .field-shell {
+      position: relative;
+      border: 1px solid #093a20;
+      background: #010302;
+      box-shadow: inset 0 0 0 1px #020804;
+    }
+
+    .field-shell::before {
+      content: ">";
+      position: absolute;
+      left: 0.45rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      color: var(--fg-muted);
+      pointer-events: none;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 0.45rem 0.45rem 0.45rem 1.3rem;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--fg);
+      font-family: var(--font-main);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+    }
+
+    .field-input::placeholder {
+      color: #02552f;
+    }
+
+    .field-input:focus {
+      outline: none;
+    }
+
+    .meta-row {
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 10px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.35rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.68rem;
+      color: var(--fg-muted);
     }
 
-    .tag {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      padding: 3px 7px;
-      border-radius: 999px;
-      border: 1px solid rgba(0, 255, 156, 0.3);
-      color: rgba(160, 255, 220, 0.85);
-      background: rgba(0, 14, 8, 0.85);
-    }
-
-    .result-banner {
-      margin-top: 10px;
-      border-radius: 5px;
-      border: 1px solid rgba(0, 255, 156, 0.5);
-      background: linear-gradient(
-        120deg,
-        rgba(0, 255, 156, 0.1),
-        rgba(0, 0, 0, 0.95)
-      );
-      padding: 8px 10px;
-      font-size: 11px;
+    .checkbox {
       display: flex;
       align-items: center;
-      gap: 8px;
-      color: rgba(218, 255, 238, 0.95);
-      min-height: 35px;
+      gap: 0.35rem;
+      cursor: pointer;
+      user-select: none;
     }
 
-    .result-banner.hidden {
+    .checkbox-square {
+      width: 10px;
+      height: 10px;
+      border: 1px solid #0c4c27;
+      background: #010402;
+      box-shadow: inset 0 0 0 1px #000;
+      position: relative;
+    }
+
+    .checkbox input {
       display: none;
     }
 
-    .result-icon {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      border: 1px solid rgba(0, 255, 156, 0.6);
-      box-shadow: 0 0 10px rgba(0, 255, 156, 0.7);
-      position: relative;
-    }
-
-    .result-icon::before {
+    .checkbox input:checked + .checkbox-square::after {
       content: "";
       position: absolute;
-      inset: 2px;
-      border-radius: inherit;
-      background: var(--accent);
+      inset: 1px;
+      background: var(--fg);
+      box-shadow: 0 0 4px rgba(0, 255, 127, 0.7);
     }
 
-    .result-text-main {
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      font-size: 10px;
-    }
-
-    .result-text-sub {
-      font-size: 10px;
-      opacity: 0.8;
-    }
-
-    .result-banner.error {
-      border-color: rgba(255, 59, 59, 0.7);
-      background: linear-gradient(
-        120deg,
-        rgba(255, 59, 59, 0.13),
-        rgba(0, 0, 0, 0.96)
-      );
-      color: rgba(255, 220, 220, 0.95);
-    }
-
-    .result-banner.error .result-icon {
-      border-color: rgba(255, 59, 59, 0.9);
-      box-shadow: 0 0 10px rgba(255, 59, 59, 0.8);
-    }
-
-    .result-banner.error .result-icon::before {
-      background: var(--danger);
-    }
-
-    .tiny {
-      font-size: 9px;
-      opacity: 0.7;
-      margin-top: 6px;
-      color: rgba(157, 255, 215, 0.8);
-    }
-
-    .tiny span {
+    .meta-token {
       color: var(--accent);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 0.4rem;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 0.5rem 0.7rem;
+      border: 1px solid #0d5a30;
+      background: linear-gradient(to bottom, #04170c, #030b06);
+      color: var(--fg);
+      font-family: var(--font-main);
+      font-size: 0.76rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.05s ease;
+    }
+
+    .btn::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg,
+        transparent 0%,
+        rgba(0, 255, 127, 0.18) 40%,
+        transparent 70%);
+      opacity: 0;
+      transition: opacity 0.18s ease;
+      pointer-events: none;
+    }
+
+    .btn-primary {
+      border-color: #00ff7f;
+      box-shadow:
+        0 0 10px rgba(0, 255, 127, 0.18),
+        inset 0 0 0 1px #062915;
+    }
+
+    .btn-secondary {
+      color: var(--fg-muted);
+      border-style: dashed;
+      border-color: #0b3a21;
+    }
+
+    .btn:hover {
+      background: linear-gradient(to bottom, #062413, #040c07);
+      box-shadow:
+        0 0 14px rgba(0, 255, 127, 0.3),
+        inset 0 0 0 1px #08361c;
+    }
+
+    .btn:hover::after {
+      opacity: 1;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow:
+        0 0 8px rgba(0, 255, 127, 0.1),
+        inset 0 0 0 1px #03140a;
+    }
+
+    .footer {
+      margin-top: 1rem;
+      border-top: 1px solid #04150b;
+      padding-top: 0.5rem;
+      font-size: 0.66rem;
+      color: var(--fg-muted);
+    }
+
+    .footer-line {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.15rem;
+    }
+
+    .footer-line span:last-child {
+      color: #ffcc00;
+    }
+
+    .warning {
+      color: var(--danger);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin-top: 0.4rem;
+      font-size: 0.64rem;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 0.55ch;
+      height: 0.8em;
+      background: var(--fg);
+      margin-left: 0.1rem;
+      animation: blink 1s step-start infinite;
+      vertical-align: text-bottom;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    @media (max-width: 480px) {
+      .terminal {
+        padding: 1.1rem 1.1rem 1.5rem;
+      }
+
+      .banner::after {
+        display: none;
+      }
     }
   </style>
 </head>
-<body class="scanlines">
-  <div class="noise"></div>
+<body>
+  <div class="scanline"></div>
 
-  <div class="frame">
-    <div class="frame-header">
-      <div class="dots">
-        <div class="dot red"></div>
-        <div class="dot yellow"></div>
-        <div class="dot green"></div>
-      </div>
-      <div class="frame-header-title">
-        H4CK-TERM // SECURE SIMULATION CONSOLE
-      </div>
-      <div class="frame-header-status">
-        <span class="status-dot"></span>SIMULATION ONLY
-      </div>
-    </div>
-
-    <!-- LEFT: LOGIN + TERMINAL -->
-    <div class="panel">
-      <div class="glitch-title">ACCESS NODE</div>
-      <div class="glitch-sub">SIMULATED AUTHENTICATION INTERFACE</div>
-
-      <div class="tag-row">
-        <div class="tag">sandbox mode</div>
-        <div class="tag">no real data</div>
-        <div class="tag">front-end only</div>
-      </div>
-
-      <div class="terminal" id="terminal">
-        <div class="terminal-line">
-          <span class="terminal-prefix">&gt;&gt;</span>
-          <span class="terminal-muted">booting virtual console...</span>
+  <div class="terminal-wrapper">
+    <div class="terminal">
+      <div class="terminal-header">
+        <div class="terminal-lights">
+          <div class="light red"></div>
+          <div class="light yellow"></div>
+          <div class="light green"></div>
         </div>
-        <div class="terminal-log" id="terminal-log">
-          <!-- log lines injected here -->
+        <div class="terminal-title">
+          OMEGA NODE // ACCESS GATEWAY
         </div>
       </div>
 
-      <div class="section-label">Auth sequence</div>
-      <form id="login-form">
-        <label class="full">
-          USER HANDLE
-          <input
-            id="login-user"
-            type="text"
-            autocomplete="off"
-            placeholder="e.g. root@simulation"
-          />
-        </label>
-        <label class="full">
-          ACCESS PHRASE
-          <input
-            id="login-pass"
-            type="password"
-            autocomplete="off"
-            placeholder="••••••••"
-          />
-        </label>
-
-        <div class="btn-row">
-          <button type="button" class="secondary" id="login-clear">
-            <span class="icon">✕</span>RESET
-          </button>
-          <button type="submit">
-            <span class="icon">▶</span>INITIATE LOGIN
-          </button>
+      <div class="terminal-body">
+        <div class="mono-small">
+          INIT SECURE SESSION_01 / AUTH CHANNEL: ENCRYPTED
         </div>
-      </form>
 
-      <div class="hint">
-        <span>Note:</span> This is a visual mockup. No credentials are transmitted or stored.
-      </div>
-
-      <div class="result-banner hidden" id="login-result">
-        <div class="result-icon"></div>
-        <div>
-          <div class="result-text-main" id="login-result-main"></div>
-          <div class="result-text-sub" id="login-result-sub"></div>
+        <div class="status-line">
+          <span>ROUTE: GHOST-NET/BLACK-CHANNEL</span>
+          <span>STATUS: <strong>STANDBY</strong></span>
         </div>
-      </div>
-    </div>
 
-    <!-- RIGHT: MOCK PAYMENT -->
-    <div class="panel">
-      <div class="panel-title">
-        MOCK PAYMENT MODULE
-        <span>client-side demo only</span>
-      </div>
-
-      <div class="badge">
-        <div class="badge-dot"></div>
-        SIMULATION ACTIVE
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="section-label">Payment payload (fake)</div>
-      <form id="payment-form">
-        <label class="full">
-          DISPLAY NAME
-          <input
-            id="card-name"
-            type="text"
-            autocomplete="off"
-            placeholder="Name used for mock transaction"
-          />
-        </label>
-
-        <label class="full">
-          CARD TOKEN (FAKE)
-          <input
-            id="card-number"
-            type="text"
-            autocomplete="off"
-            maxlength="19"
-            placeholder="0000-0000-0000-0000 (demo only)"
-          />
-        </label>
-
-        <label>
-          EXPIRY
-          <input
-            id="card-exp"
-            type="text"
-            autocomplete="off"
-            maxlength="7"
-            placeholder="MM / YY"
-          />
-        </label>
-
-        <label>
-          CODE
-          <input
-            id="card-cvv"
-            type="text"
-            autocomplete="off"
-            maxlength="4"
-            placeholder="000"
-          />
-        </label>
-
-        <label class="full">
-          MOCK AMOUNT
-          <input
-            id="amount"
-            type="text"
-            autocomplete="off"
-            placeholder="e.g. 42.00"
-          />
-        </label>
-
-        <div class="btn-row">
-          <button type="button" class="secondary" id="payment-clear">
-            <span class="icon">✕</span>Clear
-          </button>
-          <button type="submit">
-            <span class="icon">◆</span>Run simulation
-          </button>
+        <div class="banner">
+          <div class="banner-title">
+            ██ RESTRICTED ACCESS LOGIN NODE ██
+          </div>
+          <div class="banner-subtitle">
+            UNAUTHORIZED ACCESS IS PROHIBITED AND WILL BE TRACED
+          </div>
         </div>
-      </form>
 
-      <div class="mock-warning">
-        <span>Warning:</span> This module is a UI mockup only.
-        No payment data is sent anywhere. You can safely use test values.
-      </div>
+        <form class="login-form" autocomplete="off">
+          <div class="field-group">
+            <label class="field-label">Agent id</label>
+            <div class="field-shell">
+              <input
+                class="field-input"
+                type="text"
+                name="agent"
+                spellcheck="false"
+                autocomplete="off"
+                autofocus
+                placeholder="ENTER CREDENTIAL STRING"
+              />
+            </div>
+          </div>
 
-      <div class="status-feed" id="status-feed">
-        <!-- status lines injected here -->
-      </div>
+          <div class="field-group">
+            <label class="field-label">Cipher key</label>
+            <div class="field-shell">
+              <input
+                class="field-input"
+                type="password"
+                name="key"
+                autocomplete="off"
+                placeholder="ENTER AUTHORIZATION KEY"
+              />
+            </div>
+          </div>
 
-      <div class="result-banner hidden" id="payment-result">
-        <div class="result-icon"></div>
-        <div>
-          <div class="result-text-main" id="payment-result-main"></div>
-          <div class="result-text-sub" id="payment-result-sub"></div>
-        </div>
-      </div>
+          <div class="meta-row">
+            <label class="checkbox">
+              <input type="checkbox" />
+              <span class="checkbox-square"></span>
+              <span>Maintain shadow session</span>
+            </label>
+            <span class="meta-token">PROTOCOL: AURORA-13</span>
+          </div>
 
-      <div class="tiny">
-        <span>Tip:</span> In a real app, sensitive data would be handled by a secure, PCI-compliant payment provider – never stored directly in the UI.
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit">
+              Engage access
+            </button>
+            <button class="btn btn-secondary" type="button">
+              Wipe trace
+            </button>
+          </div>
+
+          <div class="footer">
+            <div class="footer-line">
+              <span>LOG CHANNEL:</span>
+              <span>SEGMENT-07: BLACK ICE</span>
+            </div>
+            <div class="footer-line">
+              <span>LAST BREACH ATTEMPT:</span>
+              <span>FAILED // SOURCE MASKED</span>
+            </div>
+            <div class="warning">
+              ALL EVENTS ARE MONITORED<span class="cursor"></span>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-
-  <script>
-    // Helper: add log line to terminal
-    function pushTerminalLog(message) {
-      const log = document.getElementById("terminal-log");
-      const line = document.createElement("div");
-      line.className = "terminal-log-line";
-      line.innerHTML = `[${new Date().toLocaleTimeString()}] <span>SYS</span> :: ${message}`;
-      log.prepend(line);
-
-      const maxLines = 8;
-      while (log.children.length > maxLines) {
-        log.removeChild(log.lastChild);
-      }
-    }
-
-    // Helper: status feed lines
-    function pushStatusLine(label, text) {
-      const feed = document.getElementById("status-feed");
-      const row = document.createElement("div");
-      row.className = "status-line";
-
-      const labelEl = document.createElement("div");
-      labelEl.className = "status-label";
-      labelEl.textContent = label;
-
-      const textEl = document.createElement("div");
-      textEl.className = "status-text";
-      textEl.innerHTML = text;
-
-      row.appendChild(labelEl);
-      row.appendChild(textEl);
-      feed.appendChild(row);
-
-      feed.scrollTop = feed.scrollHeight;
-    }
-
-    // Fade-in boot messages
-    setTimeout(() => {
-      pushTerminalLog("virtual node online, sandbox=true");
-    }, 500);
-    setTimeout(() => {
-      pushTerminalLog("monitoring inputs (no external connections detected)");
-    }, 1200);
-
-    // LOGIN SIMULATION
-    const loginForm = document.getElementById("login-form");
-    const loginResult = document.getElementById("login-result");
-    const loginResultMain = document.getElementById("login-result-main");
-    const loginResultSub = document.getElementById("login-result-sub");
-    const loginClear = document.getElementById("login-clear");
-
-    loginForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      const user = document.getElementById("login-user");
-      const pass = document.getElementById("login-pass");
-
-      user.classList.remove("error");
-      pass.classList.remove("error");
-
-      const u = user.value.trim();
-      const p = pass.value.trim();
-
-      if (!u || !p) {
-        if (!u) user.classList.add("error");
-        if (!p) pass.classList.add("error");
-        loginResult.classList.remove("hidden");
-        loginResult.classList.add("error");
-        loginResultMain.textContent = "AUTH INCOMPLETE";
-        loginResultSub.textContent = "Please provide both handle and access phrase (demo).";
-        pushTerminalLog("auth attempt rejected (missing fields) [simulated]");
-        return;
-      }
-
-      loginResult.classList.remove("error");
-      loginResult.classList.remove("hidden");
-      loginResultMain.textContent = "ACCESS GRANTED (SIMULATED)";
-      loginResultSub.textContent = `Welcome, ${u}. No real authentication occurred.`;
-      pushTerminalLog(`auth sequence accepted for user="${u}" (demo only)`);
-    });
-
-    loginClear.addEventListener("click", function () {
-      document.getElementById("login-user").value = "";
-      document.getElementById("login-pass").value = "";
-      document.getElementById("login-user").classList.remove("error");
-      document.getElementById("login-pass").classList.remove("error");
-      loginResult.classList.add("hidden");
-      pushTerminalLog("input buffer cleared by user");
-    });
-
-    // PAYMENT SIMULATION
-    const paymentForm = document.getElementById("payment-form");
-    const paymentResult = document.getElementById("payment-result");
-    const paymentResultMain = document.getElementById("payment-result-main");
-    const paymentResultSub = document.getElementById("payment-result-sub");
-    const paymentClear = document.getElementById("payment-clear");
-
-    paymentForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      const name = document.getElementById("card-name");
-      const number = document.getElementById("card-number");
-      const exp = document.getElementById("card-exp");
-      const cvv = document.getElementById("card-cvv");
-      const amount = document.getElementById("amount");
-
-      [name, number, exp, cvv, amount].forEach((el) =>
-        el.classList.remove("error")
-      );
-
-      let hasError = false;
-      [name, number, exp, cvv, amount].forEach((el) => {
-        if (!el.value.trim()) {
-          el.classList.add("error");
-          hasError = true;
-        }
-      });
-
-      if (hasError) {
-        paymentResult.classList.remove("hidden");
-        paymentResult.classList.add("error");
-        paymentResultMain.textContent = "SIMULATION FAILED";
-        paymentResultSub.textContent = "Fill in all fields with any test values to run the mock flow.";
-        pushStatusLine("VALIDATION", "Missing demo values – remember, you can use any fake numbers here.");
-        return;
-      }
-
-      // Fake analysis
-      const fakeId = Math.random().toString(36).slice(2, 10).toUpperCase();
-      const demoAmount = amount.value.trim() || "0.00";
-
-      paymentResult.classList.remove("error");
-      paymentResult.classList.remove("hidden");
-      paymentResultMain.textContent = "SIMULATION COMPLETE";
-      paymentResultSub.textContent = `Mock transaction ID: ${fakeId} | Amount: ${demoAmount} (no real charge)`;
-
-      pushStatusLine(
-        "ENCODE",
-        `Generated mock token for <span>${name.value.trim() || "ANON"}</span>.`
-      );
-      pushStatusLine(
-        "ROUTE",
-        `Would send securely to payment gateway in real scenario (skipped here).`
-      );
-      pushStatusLine(
-        "RESULT",
-        `Simulation successful. No network request made. Demo ID: <span>${fakeId}</span>.`
-      );
-    });
-
-    paymentClear.addEventListener("click", function () {
-      ["card-name", "card-number", "card-exp", "card-cvv", "amount"].forEach(
-        (id) => {
-          const el = document.getElementById(id);
-          el.value = "";
-          el.classList.remove("error");
-        }
-      );
-      paymentResult.classList.add("hidden");
-      pushStatusLine("RESET", "Cleared all mock fields.");
-    });
-
-    // Format fake card token visually: XXXX-XXXX-XXXX-XXXX
-    document.getElementById("card-number").addEventListener("input", function (e) {
-      let value = e.target.value.replace(/[^\d]/g, "").slice(0, 16);
-      const groups = [];
-      for (let i = 0; i < value.length; i += 4) {
-        groups.push(value.slice(i, i + 4));
-      }
-      e.target.value = groups.join("-");
-    });
-
-    // Format expiry as MM / YY
-    document.getElementById("card-exp").addEventListener("input", function (e) {
-      let value = e.target.value.replace(/[^\d]/g, "").slice(0, 4);
-      if (value.length >= 3) {
-        value = value.slice(0, 2) + " / " + value.slice(2);
-      }
-      e.target.value = value;
-    });
-
-    // Allow only digits for CVV
-    document.getElementById("card-cvv").addEventListener("input", function (e) {
-      e.target.value = e.target.value.replace(/[^\d]/g, "").slice(0, 4);
-    });
-  </script>
 </body>
 </html>
