@@ -1,473 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Secure Access Terminal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
+<meta charset="UTF-8">
+<title>Media Hub</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ---------------------------------------------------------
+   MATERIAL DESIGN 3 COLOR SYSTEM (LIGHT + DARK)
+--------------------------------------------------------- */
+:root {
+    --md-primary: #145DA0;
+    --md-primary-container: #D0E4FF;
+    --md-on-primary-container: #001C38;
+
+    --md-surface: #FDFBFF;
+    --md-surface-variant: #E0E2EC;
+    --md-surface-container: #E6E8F0;
+
+    --md-outline: #757780;
+    --md-on-surface: #1B1B21;
+    --md-on-surface-variant: #444650;
+
+    --radius-medium: 16px;
+    --radius-large: 24px;
+
+    --transition: 0.25s cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-color-scheme: dark) {
     :root {
-      --bg: #020405;
-      --fg: #00ff7f;
-      --fg-muted: #00b35a;
-      --danger: #ff3b3b;
-      --accent: #00e0ff;
-      --border: #0a2a1a;
-      --font-main: "Consolas", "Courier New", monospace;
+        --md-primary: #9FC9FF;
+        --md-primary-container: #004A77;
+        --md-on-primary-container: #D0E4FF;
+
+        --md-surface: #121316;
+        --md-surface-variant: #2A2D31;
+        --md-surface-container: #1E2024;
+
+        --md-outline: #8E9196;
+        --md-on-surface: #E2E2E6;
+        --md-on-surface-variant: #C4C6CA;
     }
+}
 
-    * { box-sizing: border-box; }
+/* ---------------------------------------------------------
+   BASE LAYOUT
+--------------------------------------------------------- */
+body {
+    margin: 0;
+    font-family: "Roboto", system-ui, sans-serif;
+    background: var(--md-surface);
+    color: var(--md-on-surface);
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+    transition: opacity 260ms var(--transition), transform 260ms var(--transition);
+}
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at top, #04100a 0, #020405 40%, #000000 100%);
-      color: var(--fg);
-      font-family: var(--font-main);
-      overflow: hidden;
-    }
+body.page-entered {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
 
-    .scanline {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.25) 0px,
-        rgba(0, 0, 0, 0.25) 1px,
-        transparent 1px,
-        transparent 3px
-      );
-      mix-blend-mode: soft-light;
-      opacity: 0.7;
-      z-index: 2;
-    }
+body.page-exit {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+}
 
-    .terminal-wrapper {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
+main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+}
 
-    .terminal {
-      position: relative;
-      width: 100%;
-      max-width: 420px;
-      background: rgba(0, 0, 0, 0.88);
-      border: 1px solid var(--border);
-      box-shadow:
-        0 0 0 1px #001407,
-        0 0 30px rgba(0, 0, 0, 0.9),
-        0 0 60px rgba(0, 255, 127, 0.15);
-      padding: 1.5rem 1.75rem 2rem;
-      overflow: hidden;
-    }
+/* ---------------------------------------------------------
+   FLOATING TOP APP BAR
+--------------------------------------------------------- */
+.app-bar-container {
+    position: sticky;
+    top: 0;
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    z-index: 10;
+}
 
-    .terminal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.25rem;
-    }
+.app-bar {
+    background: var(--md-surface-container);
+    border-radius: 999px;
+    padding: 10px 20px;
+    border: 1px solid var(--md-outline);
+    backdrop-filter: blur(18px);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 960px;
+    width: 100%;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+}
 
-    .terminal-status {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.72rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--fg);
-    }
+.app-bar-title {
+    font-size: 1rem;
+    font-weight: 600;
+}
 
-    .status-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: #00ff7f;
-      box-shadow: 0 0 8px rgba(0, 255, 127, 0.8);
-      animation: netPulse 1.4s infinite;
-    }
+.app-bar-spacer {
+    flex: 1;
+}
 
-    @keyframes netPulse {
-      0% { opacity: 0.4; }
-      50% { opacity: 1; }
-      100% { opacity: 0.4; }
-    }
+/* ---------------------------------------------------------
+   HERO SECTION
+--------------------------------------------------------- */
+.hero {
+    background: linear-gradient(135deg,
+        var(--md-primary-container),
+        var(--md-surface-variant)
+    );
+    border-radius: var(--radius-large);
+    padding: 32px 24px;
+    color: var(--md-on-primary-container);
+    margin-bottom: 32px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.28);
+}
 
-    .status-offline {
-      background: #ff3b3b !important;
-      box-shadow: 0 0 8px rgba(255, 0, 0, 0.8) !important;
-    }
+.hero-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0 0 8px;
+}
 
-    .ghost-route {
-      font-size: 0.7rem;
-      color: var(--accent);
-      letter-spacing: 0.12em;
-      height: 70px;
-      overflow: hidden;
-      margin-bottom: 1rem;
-      border-left: 2px solid var(--accent);
-      padding-left: 0.5rem;
-      opacity: 0.85;
-    }
+.hero-subtitle {
+    max-width: 420px;
+    opacity: 0.9;
+    margin: 0 0 16px;
+}
 
-    .net-metrics {
-      font-size: 0.72rem;
-      letter-spacing: 0.14em;
-      color: var(--fg-muted);
-      margin-top: 0.3rem;
-    }
+.hero-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
 
-    #boot-sequence {
-      font-size: 0.75rem;
-      letter-spacing: 0.14em;
-      color: var(--fg-muted);
-      margin-bottom: 1rem;
-    }
+.hero-chip {
+    background: rgba(255,255,255,0.15);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    backdrop-filter: blur(10px);
+}
 
-    /* Original styles continue… */
-    .terminal-lights {
-      display: flex;
-      gap: 0.35rem;
-    }
+/* ---------------------------------------------------------
+   SERVICE CARDS
+--------------------------------------------------------- */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+}
 
-    .light {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #1b2a23;
-      position: relative;
-    }
+.card {
+    background: var(--md-surface-container);
+    border-radius: var(--radius-medium);
+    padding: 22px 20px;
+    border: 1px solid var(--md-outline);
+    text-decoration: none;
+    color: var(--md-on-surface);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    transform: translateY(8px) scale(0.98);
+    opacity: 0;
+    animation: card-enter 360ms var(--transition) forwards;
+}
 
-    .light.red::after {
-      content: "";
-      position: absolute;
-      inset: 1px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #ff7777, #ff0000);
-    }
+.card:nth-child(2) { animation-delay: 80ms; }
 
-    .light.yellow::after {
-      content: "";
-      position: absolute;
-      inset: 1px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #fff099, #ffcc00);
-    }
+@keyframes card-enter {
+    from { opacity: 0; transform: translateY(12px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
 
-    .light.green::after {
-      content: "";
-      position: absolute;
-      inset: 1px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #9fffaf, #00ff7f);
-    }
+.card:hover {
+    transform: translateY(-2px) scale(1.01);
+    border-color: var(--md-primary);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.55);
+}
 
-    .terminal-title {
-      font-size: 0.74rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--fg-muted);
-      text-align: right;
-    }
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
 
-    .banner {
-      border: 1px solid #06351d;
-      background: radial-gradient(circle at top left, #04110a 0, #020604 55%, #000 100%);
-      padding: 0.9rem;
-      margin-bottom: 1.25rem;
-    }
+/* ---------------------------------------------------------
+   BRAND ICONS (FIXED SIZE)
+--------------------------------------------------------- */
+.service-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
 
-    .banner-title {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      margin-bottom: 0.45rem;
-      color: var(--fg);
-    }
+.service-icon svg {
+    width: 30px !important;
+    height: 30px !important;
+    display: block;
+}
 
-    .banner-subtitle {
-      font-size: 0.7rem;
-      color: var(--fg-muted);
-      letter-spacing: 0.06em;
-    }
+/* ---------------------------------------------------------
+   CARD TEXT
+--------------------------------------------------------- */
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
 
-    .field-group { margin-bottom: 0.85rem; }
+.card-desc {
+    color: var(--md-on-surface-variant);
+}
 
-    .field-label {
-      font-size: 0.68rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--fg-muted);
-      margin-bottom: 0.25rem;
-      display: block;
-    }
+.accent {
+    margin-top: auto;
+    color: var(--md-primary);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: var(--transition);
+}
 
-    .field-shell {
-      position: relative;
-      border: 1px solid #093a20;
-      background: #010302;
-      box-shadow: inset 0 0 0 1px #020804;
-    }
-
-    .field-shell::before {
-      content: ">";
-      position: absolute;
-      left: 0.45rem;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 0.75rem;
-      color: var(--fg-muted);
-    }
-
-    .field-input {
-      width: 100%;
-      padding: 0.45rem 0.45rem 0.45rem 1.3rem;
-      background: transparent;
-      border: none;
-      color: var(--fg);
-      font-family: var(--font-main);
-      font-size: 0.8rem;
-    }
-
-    .hardware-key-shell {
-      padding: 0.55rem 0.75rem;
-      display: flex;
-      align-items: center;
-      border: 1px solid #0d5a30;
-      background: #010302;
-      box-shadow: inset 0 0 0 1px #020804;
-      margin-bottom: 0.5rem;
-    }
-
-    .hardware-status {
-      font-size: 0.75rem;
-      letter-spacing: 0.12em;
-      color: var(--accent);
-      animation: pulse 1.6s infinite;
-    }
-
-    @keyframes pulse {
-      0% { opacity: 0.4; }
-      50% { opacity: 1; }
-      100% { opacity: 0.4; }
-    }
-
-    .btn {
-      flex: 1;
-      padding: 0.5rem 0.7rem;
-      border: 1px solid #0d5a30;
-      background: linear-gradient(to bottom, #04170c, #030b06);
-      color: var(--fg);
-      font-family: var(--font-main);
-      font-size: 0.76rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      border-color: #00ff7f;
-      box-shadow: 0 0 10px rgba(0, 255, 127, 0.18);
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 0.6rem;
-      margin-top: 0.4rem;
-    }
-  </style>
+.card:hover .accent {
+    color: var(--md-primary-container);
+    transform: translateX(2px);
+}
+</style>
 </head>
 
 <body>
-  <div class="scanline"></div>
 
-  <div class="terminal-wrapper">
-    <div class="terminal">
-
-      <!-- HEADER -->
-      <div class="terminal-header">
-        <div class="terminal-lights">
-          <div class="light red"></div>
-          <div class="light yellow"></div>
-          <div class="light green"></div>
-        </div>
-
-        <div class="terminal-title">
-          OMEGA NODE // ACCESS GATEWAY
-        </div>
-
-        <div class="terminal-status">
-          <span class="status-dot" id="net-dot"></span>
-          <span id="net-text">ONLINE</span>
-        </div>
-      </div>
-
-      <!-- BOOT SEQUENCE -->
-      <div id="boot-sequence"></div>
-
-      <!-- LOGIN CONTAINER (hidden until boot completes) -->
-      <div id="login-container" style="display:none;">
-
-        <!-- Ghost Node Routing -->
-        <div class="ghost-route" id="ghost-route"></div>
-
-        <!-- Network Metrics -->
-        <div class="net-metrics">
-          LATENCY: <span id="latency-val">-- ms</span><br>
-          PACKET LOSS: <span id="loss-val">--%</span>
-        </div>
-
-        <div class="banner">
-          <div class="banner-title">██ RESTRICTED ACCESS LOGIN NODE ██</div>
-          <div class="banner-subtitle">UNAUTHORIZED ACCESS IS PROHIBITED AND WILL BE TRACED</div>
-        </div>
-
-        <form class="login-form" autocomplete="off">
-          <div class="field-group">
-            <label class="field-label">ID</label>
-            <div class="field-shell">
-              <input class="field-input" type="text" placeholder="ENTER CREDENTIAL STRING">
-            </div>
-          </div>
-
-          <div class="field-group">
-            <label class="field-label">Key</label>
-            <div class="field-shell">
-              <input class="field-input" type="password" placeholder="ENTER AUTHORIZATION KEY">
-            </div>
-          </div>
-
-          <!-- Hardware Key -->
-          <div class="field-group">
-            <label class="field-label">Hardware Security Key</label>
-            <div class="hardware-key-shell">
-              <span class="hardware-status" id="hw-status">AWAITING DEVICE INSERTION...</span>
-            </div>
-            <button class="btn btn-primary" type="button" id="hw-init">Initiate Key Challenge</button>
-          </div>
-
-          <div class="btn-row">
-            <button class="btn btn-primary" type="submit">Engage Access</button>
-            <button class="btn" type="button">Wipe Trace</button>
-          </div>
-        </form>
-      </div>
+<!-- ---------------------------------------------------------
+     FLOATING TOP APP BAR
+--------------------------------------------------------- -->
+<div class="app-bar-container">
+    <div class="app-bar">
+        <div class="app-bar-title">Media Hub</div>
+        <div class="app-bar-spacer"></div>
     </div>
-  </div>
+</div>
 
-  <!-- JAVASCRIPT -->
-  <script>
-    // ONLINE STATUS
-    function updateStatus() {
-      const dot = document.getElementById("net-dot");
-      const text = document.getElementById("net-text");
+<main>
 
-      if (navigator.onLine) {
-        dot.classList.remove("status-offline");
-        text.textContent = "ONLINE";
-        text.style.color = "#00ff7f";
-      } else {
-        dot.classList.add("status-offline");
-        text.textContent = "OFFLINE";
-        text.style.color = "#ff3b3b";
-      }
+<!-- ---------------------------------------------------------
+     HERO
+--------------------------------------------------------- -->
+<section class="hero">
+    <h1 class="hero-title">Request. Stream. Relax.</h1>
+    <p class="hero-subtitle">
+        Logins can be requested via email at addme@travb.wtf
+    </p>
+    <div class="hero-chips">
+        <span class="hero-chip">Movies</span>
+        <span class="hero-chip">TV Shows</span>
+        <span class="hero-chip">Fuck Netflix</span>
+    </div>
+</section>
+
+<!-- ---------------------------------------------------------
+     SERVICE CARDS
+--------------------------------------------------------- -->
+<section class="grid">
+
+    <!-- JELLYFIN -->
+    <a class="card shared-axis-link" href="https://watch.travb.wtf/">
+        <div class="card-header">
+            <div class="service-icon">
+                <svg viewBox="0 0 512 512" width="30" height="30">
+                    <defs>
+                        <linearGradient id="jellyfinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00A4DC"/>
+                            <stop offset="100%" stop-color="#7B3FE4"/>
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#jellyfinGradient)"
+                          d="M256 64L64 416h384L256 64zm0 96l120 208H136L256 160z"/>
+                </svg>
+            </div>
+            <div>
+                <div class="card-title">Jellyfin</div>
+                <div class="card-desc">Stream movies and shows.</div>
+            </div>
+        </div>
+        <div class="accent">Open Jellyfin →</div>
+    </a>
+
+    <!-- JELLYSEERR -->
+    <a class="card shared-axis-link" href="https://request.travb.wtf/">
+        <div class="card-header">
+            <div class="service-icon">
+                <svg viewBox="0 0 512 512" width="30" height="30">
+                    <defs>
+                        <linearGradient id="seerrGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#FF6A3D"/>
+                            <stop offset="100%" stop-color="#FFB347"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="256" cy="256" r="208" fill="url(#seerrGradient)"/>
+                    <path fill="#FFFFFF" d="M312 164c-20-14-44-20-68-20-52 0-92 30-92 76 0 44 32 64 76 74l20 4c26 6 40 14 40 30 0 20-20 32-48 32-26 0-48-10-64-26l-32 36c24 24 60 40 100 40 60 0 104-30 104-82 0-48-34-68-80-78l-20-4c-24-6-36-14-36-30 0-18 18-30 44-30 22 0 40 8 52 18l28-40z"/>
+                </svg>
+            </div>
+            <div>
+                <div class="card-title">Seerr</div>
+                <div class="card-desc">Request new content.</div>
+            </div>
+        </div>
+        <div class="accent">Open Jellyseerr →</div>
+    </a>
+
+</section>
+
+</main>
+
+<script>
+/* ---------------------------------------------------------
+   SHARED-AXIS TRANSITION
+--------------------------------------------------------- */
+(function () {
+    const body = document.body;
+
+    function onReady() {
+        requestAnimationFrame(() => body.classList.add('page-entered'));
+
+        document.querySelectorAll('a.shared-axis-link').forEach(link => {
+            link.addEventListener('click', e => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                e.preventDefault();
+                const url = link.href;
+                body.classList.add('page-exit');
+                setTimeout(() => window.location.href = url, 220);
+            });
+        });
     }
-    window.addEventListener("online", updateStatus);
-    window.addEventListener("offline", updateStatus);
-    updateStatus();
 
-    // LATENCY
-    function updateLatency() {
-      const latency = Math.floor(Math.random() * 120) + 20;
-      document.getElementById("latency-val").textContent = latency + " ms";
-    }
-    setInterval(updateLatency, 1500);
-    updateLatency();
+    document.readyState === 'loading'
+        ? document.addEventListener('DOMContentLoaded', onReady)
+        : onReady();
+})();
+</script>
 
-    // PACKET LOSS
-    function updatePacketLoss() {
-      const loss = (Math.random() * 3).toFixed(1);
-      document.getElementById("loss-val").textContent = loss + "%";
-    }
-    setInterval(updatePacketLoss, 2000);
-    updatePacketLoss();
-
-    // GHOST NODE ROUTING
-    const nodes = [
-      "NODE-01 // SHADOW RELAY",
-      "NODE-14 // GHOST MIRROR",
-      "NODE-22 // DARK FIBER",
-      "NODE-37 // ICEBOUND EXIT",
-      "NODE-44 // NULL ROUTER",
-      "NODE-51 // PHANTOM GATE",
-      "NODE-63 // BLACKSTAR UPLINK"
-    ];
-    let idx = 0;
-
-    function cycleNodes() {
-      const box = document.getElementById("ghost-route");
-      const line = document.createElement("div");
-      line.textContent = "ROUTING → " + nodes[idx % nodes.length];
-      box.appendChild(line);
-
-      if (box.children.length > 5) {
-        box.removeChild(box.children[0]);
-      }
-      idx++;
-    }
-    setInterval(cycleNodes, 900);
-    cycleNodes();
-
-    // HARDWARE KEY SIMULATION
-    document.getElementById("hw-init").addEventListener("click", () => {
-      const status = document.getElementById("hw-status");
-      status.textContent = "DETECTING SECURITY TOKEN...";
-      status.style.color = "#ffcc00";
-
-      setTimeout(() => {
-        status.textContent = "KEY DETECTED // READY FOR CHALLENGE";
-        status.style.color = "#00ff7f";
-      }, 1500);
-    });
-
-    // BOOT SEQUENCE
-    const bootLines = [
-      "INITIALIZING OMEGA NODE KERNEL...",
-      "LOADING SECURE MODULES...",
-      "MOUNTING ENCRYPTED VOLUMES...",
-      "SPAWNING SHADOW PROCESSES...",
-      "ESTABLISHING GHOST-NET LINK...",
-      "VERIFYING INTEGRITY CHANNELS...",
-      "BOOT COMPLETE // READY"
-    ];
-
-    let bootIndex = 0;
-
-    function runBoot() {
-      const bootBox = document.getElementById("boot-sequence");
-      const line = document.createElement("div");
-      line.textContent = bootLines[bootIndex];
-      bootBox.appendChild(line);
-
-      bootIndex++;
-
-      if (bootIndex < bootLines.length) {
-        setTimeout(runBoot, 550);
-      } else {
-        setTimeout(() => {
-          bootBox.style.display = "none";
-          document.getElementById("login-container").style.display = "block";
-        }, 600);
-      }
-    }
-    runBoot();
-  </script>
 </body>
 </html>
