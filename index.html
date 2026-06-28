@@ -1,357 +1,902 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Media Hub</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Vault — Your Streaming Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;1,400&family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Geist:wght@300;400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'geist': ['Geist', 'sans-serif'],
+                        'serif-display': ['Instrument Serif', 'serif'],
+                        'jakarta': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'cyber-purple': '#A855F7',
+                        'cyber-blue': '#3B82F6',
+                        'cyber-cyan': '#06B6D4',
+                        'cyber-pink': '#EC4899',
+                        'surface': '#0A0A0F',
+                        'surface-light': '#12121A',
+                        'surface-lighter': '#1A1A26',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float 6s ease-in-out 2s infinite',
+                        'float-slow': 'float 8s ease-in-out 1s infinite',
+                        'pulse-glow': 'pulseGlow 4s ease-in-out infinite',
+                        'scan': 'scan 3s ease-in-out infinite',
+                        'orbit': 'orbit 20s linear infinite',
+                        'orbit-reverse': 'orbit 15s linear infinite reverse',
+                        'shimmer': 'shimmer 3s ease-in-out infinite',
+                        'data-stream': 'dataStream 2s linear infinite',
+                        'border-spin': 'borderSpin 4s linear infinite',
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'fade-in-up-delay': 'fadeInUp 0.8s ease-out 0.2s forwards',
+                        'fade-in-up-delay-2': 'fadeInUp 0.8s ease-out 0.4s forwards',
+                        'fade-in-up-delay-3': 'fadeInUp 0.8s ease-out 0.6s forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+                            '50%': { opacity: '0.8', transform: 'scale(1.05)' },
+                        },
+                        scan: {
+                            '0%, 100%': { transform: 'translateY(-100%)' },
+                            '50%': { transform: 'translateY(100%)' },
+                        },
+                        orbit: {
+                            '0%': { transform: 'rotate(0deg) translateX(160px) rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg) translateX(160px) rotate(-360deg)' },
+                        },
+                        'orbit-reverse': {
+                            '0%': { transform: 'rotate(0deg) translateX(120px) rotate(0deg)' },
+                            '100%': { transform: 'rotate(-360deg) translateX(120px) rotate(360deg)' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% center' },
+                            '100%': { backgroundPosition: '200% center' },
+                        },
+                        dataStream: {
+                            '0%': { transform: 'translateY(-100%)', opacity: '0' },
+                            '10%': { opacity: '1' },
+                            '90%': { opacity: '1' },
+                            '100%': { transform: 'translateY(100vh)', opacity: '0' },
+                        },
+                        borderSpin: {
+                            '0%': { '--angle': '0deg' },
+                            '100%': { '--angle': '360deg' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #050508; font-family: 'Geist', sans-serif; color: #fff; overflow-x: hidden; }
 
-<style>
-/* ---------------------------------------------------------
-   MATERIAL DESIGN 3 COLOR SYSTEM (LIGHT + DARK)
---------------------------------------------------------- */
-:root {
-    --md-primary: #145DA0;
-    --md-primary-container: #D0E4FF;
-    --md-on-primary-container: #001C38;
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0A0A0F; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #A855F7, #3B82F6); border-radius: 3px; }
 
-    --md-surface: #FDFBFF;
-    --md-surface-variant: #E0E2EC;
-    --md-surface-container: #E6E8F0;
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(168, 85, 247, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(168, 85, 247, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
 
-    --md-outline: #757780;
-    --md-on-surface: #1B1B21;
-    --md-on-surface-variant: #444650;
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
 
-    --radius-medium: 16px;
-    --radius-large: 24px;
+        .glow-purple { box-shadow: 0 0 60px rgba(168, 85, 247, 0.15), 0 0 120px rgba(168, 85, 247, 0.05); }
+        .glow-blue { box-shadow: 0 0 60px rgba(59, 130, 246, 0.15), 0 0 120px rgba(59, 130, 246, 0.05); }
+        .glow-cyan { box-shadow: 0 0 60px rgba(6, 182, 212, 0.15), 0 0 120px rgba(6, 182, 212, 0.05); }
 
-    --transition: 0.25s cubic-bezier(0.2, 0, 0, 1);
-}
+        .text-gradient-purple {
+            background: linear-gradient(135deg, #A855F7, #6366F1, #3B82F6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .text-gradient-cyan {
+            background: linear-gradient(135deg, #06B6D4, #3B82F6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .text-gradient-shimmer {
+            background: linear-gradient(90deg, #A855F7, #06B6D4, #A855F7, #06B6D4);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s ease-in-out infinite;
+        }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --md-primary: #9FC9FF;
-        --md-primary-container: #004A77;
-        --md-on-primary-container: #D0E4FF;
+        .service-card {
+            position: relative;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .service-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, transparent 40%, rgba(168, 85, 247, 0.3), transparent 60%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .service-card:hover::before { opacity: 1; }
+        .service-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(168, 85, 247, 0.2);
+            box-shadow: 0 20px 60px rgba(168, 85, 247, 0.1), 0 0 40px rgba(168, 85, 247, 0.05);
+        }
 
-        --md-surface: #121316;
-        --md-surface-variant: #2A2D31;
-        --md-surface-container: #1E2024;
+        .btn-cyber {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .btn-cyber::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: conic-gradient(from 0deg, #A855F7, #3B82F6, #06B6D4, #EC4899, #A855F7);
+            border-radius: inherit;
+            z-index: -1;
+            animation: borderSpin 4s linear infinite;
+        }
+        .btn-cyber::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            background: #0A0A0F;
+            border-radius: inherit;
+            z-index: -1;
+            transition: background 0.3s ease;
+        }
+        .btn-cyber:hover::after { background: #12121A; }
 
-        --md-outline: #8E9196;
-        --md-on-surface: #E2E2E6;
-        --md-on-surface-variant: #C4C6CA;
-    }
-}
+        @property --angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+        @keyframes borderSpin {
+            to { --angle: 360deg; }
+        }
 
-/* ---------------------------------------------------------
-   BASE LAYOUT
---------------------------------------------------------- */
-body {
-    margin: 0;
-    font-family: "Roboto", system-ui, sans-serif;
-    background: var(--md-surface);
-    color: var(--md-on-surface);
-    opacity: 0;
-    transform: translateY(12px) scale(0.98);
-    transition: opacity 260ms var(--transition), transform 260ms var(--transition);
-}
+        .noise::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.4;
+        }
 
-body.page-entered {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-}
+        .data-particle {
+            position: absolute;
+            width: 2px;
+            height: 30px;
+            background: linear-gradient(to bottom, transparent, rgba(168, 85, 247, 0.6), transparent);
+            border-radius: 2px;
+            animation: dataStream var(--duration) linear infinite;
+            animation-delay: var(--delay);
+            left: var(--left);
+            opacity: 0;
+        }
 
-body.page-exit {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.96);
-}
+        .orbital-ring {
+            border: 1px solid rgba(168, 85, 247, 0.08);
+            border-radius: 50%;
+            position: absolute;
+        }
 
-main {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 24px 16px 48px;
-}
+        .status-dot {
+            position: relative;
+        }
+        .status-dot::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            background: inherit;
+            animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+            opacity: 0;
+        }
+        @keyframes ping {
+            75%, 100% { transform: scale(2.5); opacity: 0; }
+            0% { opacity: 0.4; }
+        }
 
-/* ---------------------------------------------------------
-   FLOATING TOP APP BAR
---------------------------------------------------------- */
-.app-bar-container {
-    position: sticky;
-    top: 0;
-    padding: 16px;
-    display: flex;
-    justify-content: center;
-    z-index: 10;
-}
+        .marquee-track {
+            display: flex;
+            animation: marquee 30s linear infinite;
+            width: max-content;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
 
-.app-bar {
-    background: var(--md-surface-container);
-    border-radius: 999px;
-    padding: 10px 20px;
-    border: 1px solid var(--md-outline);
-    backdrop-filter: blur(18px);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    max-width: 960px;
-    width: 100%;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-}
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.3), transparent);
+            animation: scan 4s ease-in-out infinite;
+        }
 
-.app-bar-title {
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-.app-bar-spacer {
-    flex: 1;
-}
-
-/* ---------------------------------------------------------
-   HERO SECTION
---------------------------------------------------------- */
-.hero {
-    background: linear-gradient(135deg,
-        var(--md-primary-container),
-        var(--md-surface-variant)
-    );
-    border-radius: var(--radius-large);
-    padding: 32px 24px;
-    color: var(--md-on-primary-container);
-    margin-bottom: 32px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.28);
-}
-
-.hero-title {
-    font-size: 2.2rem;
-    font-weight: 700;
-    margin: 0 0 8px;
-}
-
-.hero-subtitle {
-    max-width: 420px;
-    opacity: 0.9;
-    margin: 0 0 16px;
-}
-
-.hero-chips {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.hero-chip {
-    background: rgba(255,255,255,0.15);
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 0.8rem;
-    backdrop-filter: blur(10px);
-}
-
-/* ---------------------------------------------------------
-   SERVICE CARDS
---------------------------------------------------------- */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 24px;
-}
-
-.card {
-    background: var(--md-surface-container);
-    border-radius: var(--radius-medium);
-    padding: 22px 20px;
-    border: 1px solid var(--md-outline);
-    text-decoration: none;
-    color: var(--md-on-surface);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.35);
-    transform: translateY(8px) scale(0.98);
-    opacity: 0;
-    animation: card-enter 360ms var(--transition) forwards;
-}
-
-.card:nth-child(2) { animation-delay: 80ms; }
-
-@keyframes card-enter {
-    from { opacity: 0; transform: translateY(12px) scale(0.96); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.card:hover {
-    transform: translateY(-2px) scale(1.01);
-    border-color: var(--md-primary);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.55);
-}
-
-.card-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-/* ---------------------------------------------------------
-   BRAND ICONS (FIXED SIZE)
---------------------------------------------------------- */
-.service-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.service-icon svg {
-    width: 30px !important;
-    height: 30px !important;
-    display: block;
-}
-
-/* ---------------------------------------------------------
-   CARD TEXT
---------------------------------------------------------- */
-.card-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.card-desc {
-    color: var(--md-on-surface-variant);
-}
-
-.accent {
-    margin-top: auto;
-    color: var(--md-primary);
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    transition: var(--transition);
-}
-
-.card:hover .accent {
-    color: var(--md-primary-container);
-    transform: translateX(2px);
-}
-</style>
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+    </style>
 </head>
+<body class="noise grid-bg">
 
-<body>
+    <!-- Data Stream Particles -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0" id="particles"></div>
 
-<!-- ---------------------------------------------------------
-     FLOATING TOP APP BAR
---------------------------------------------------------- -->
-<div class="app-bar-container">
-    <div class="app-bar">
-        <div class="app-bar-title">Media Hub</div>
-        <div class="app-bar-spacer"></div>
+    <!-- Background Orbs -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div class="absolute top-1/4 -left-32 w-96 h-96 bg-purple-600/10 rounded-full blur-[120px] animate-pulse-glow"></div>
+        <div class="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] animate-pulse-glow" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-600/5 rounded-full blur-[150px] animate-pulse-glow" style="animation-delay: 4s;"></div>
     </div>
-</div>
 
-<main>
-
-<!-- ---------------------------------------------------------
-     HERO
---------------------------------------------------------- -->
-<section class="hero">
-    <h1 class="hero-title">Request. Stream. Relax.</h1>
-    <p class="hero-subtitle">
-        Logins can be requested via email at addme@travb.wtf
-    </p>
-    <div class="hero-chips">
-        <span class="hero-chip">Movies</span>
-        <span class="hero-chip">TV Shows</span>
-        <span class="hero-chip">Fuck Netflix</span>
-    </div>
-</section>
-
-<!-- ---------------------------------------------------------
-     SERVICE CARDS
---------------------------------------------------------- -->
-<section class="grid">
-
-    <!-- JELLYFIN -->
-    <a class="card shared-axis-link" href="https://watch.travb.wtf/">
-        <div class="card-header">
-            <div class="service-icon">
-                <svg viewBox="0 0 512 512" width="30" height="30">
-                    <defs>
-                        <linearGradient id="jellyfinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#00A4DC"/>
-                            <stop offset="100%" stop-color="#7B3FE4"/>
-                        </linearGradient>
-                    </defs>
-                    <path fill="url(#jellyfinGradient)"
-                          d="M256 64L64 416h384L256 64zm0 96l120 208H136L256 160z"/>
-                </svg>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-5">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="relative w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow duration-300">
+                    <i data-lucide="play" class="w-4 h-4 text-white fill-white"></i>
+                </div>
+                <span class="text-white font-medium tracking-tight text-lg">MediaVault</span>
+            </a>
+            <div class="hidden md:flex items-center gap-1">
+                <a href="#services" class="px-4 py-2 text-sm text-white/50 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-200">Services</a>
+                <a href="#features" class="px-4 py-2 text-sm text-white/50 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-200">Features</a>
+                <a href="#status" class="px-4 py-2 text-sm text-white/50 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-200">Status</a>
             </div>
-            <div>
-                <div class="card-title">Jellyfin</div>
-                <div class="card-desc">Stream movies and shows.</div>
+            <div class="flex items-center gap-3">
+                <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs text-emerald-400" id="nav-status">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-dot"></span>
+                    Checking…
+                </div>
+                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-white/5 transition-colors">
+                    <i data-lucide="menu" class="w-5 h-5 text-white/70"></i>
+                </button>
             </div>
         </div>
-        <div class="accent">Open Jellyfin →</div>
-    </a>
+        <div id="mobile-menu" class="hidden md:hidden mt-4 glass-strong rounded-2xl p-4 space-y-1">
+            <a href="#services" class="block px-4 py-3 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all">Services</a>
+            <a href="#features" class="block px-4 py-3 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all">Features</a>
+            <a href="#status" class="block px-4 py-3 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all">Status</a>
+        </div>
+    </nav>
 
-    <!-- JELLYSEERR -->
-    <a class="card shared-axis-link" href="https://request.travb.wtf/">
-        <div class="card-header">
-            <div class="service-icon">
-                <svg viewBox="0 0 512 512" width="30" height="30">
-                    <defs>
-                        <linearGradient id="seerrGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#FF6A3D"/>
-                            <stop offset="100%" stop-color="#FFB347"/>
-                        </linearGradient>
-                    </defs>
-                    <circle cx="256" cy="256" r="208" fill="url(#seerrGradient)"/>
-                    <path fill="#FFFFFF" d="M312 164c-20-14-44-20-68-20-52 0-92 30-92 76 0 44 32 64 76 74l20 4c26 6 40 14 40 30 0 20-20 32-48 32-26 0-48-10-64-26l-32 36c24 24 60 40 100 40 60 0 104-30 104-82 0-48-34-68-80-78l-20-4c-24-6-36-14-36-30 0-18 18-30 44-30 22 0 40 8 52 18l28-40z"/>
-                </svg>
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center px-6 pt-32 pb-20">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+            <div class="orbital-ring w-[320px] h-[320px] animate-pulse-glow"></div>
+            <div class="orbital-ring w-[500px] h-[500px]" style="border-color: rgba(59, 130, 246, 0.05);"></div>
+            <div class="orbital-ring w-[700px] h-[700px]" style="border-color: rgba(6, 182, 212, 0.03);"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-purple-500/40 animate-orbit"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-blue-400/30 animate-orbit-reverse"></div>
+        </div>
+
+        <div class="relative z-10 text-center max-w-4xl mx-auto">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 opacity-0 animate-fade-in-up">
+                <span class="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
+                <span class="text-xs font-medium text-white/60 tracking-wide uppercase">Personal Media Server</span>
             </div>
-            <div>
-                <div class="card-title">Seerr</div>
-                <div class="card-desc">Request new content.</div>
+
+            <h1 class="font-serif-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.9] tracking-tight mb-6 opacity-0 animate-fade-in-up-delay">
+                Your <span class="text-gradient-purple italic">Media</span><br>
+                <span class="text-gradient-shimmer">Universe</span>
+            </h1>
+
+            <p class="text-base sm:text-lg text-white/40 max-w-xl mx-auto mb-10 leading-relaxed font-light opacity-0 animate-fade-in-up-delay-2">
+                Stream your entire collection of movies, shows, and music. Request new content instantly. All from your personal server.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 opacity-0 animate-fade-in-up-delay-3">
+                <a href="https://watch.travb.wtf/" target="_blank" rel="noopener" class="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium text-sm hover:from-purple-500 hover:to-blue-500 transition-all duration-300 shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-0.5">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                    Launch Jellyfin
+                    <i data-lucide="arrow-up-right" class="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"></i>
+                </a>
+                <a href="https://request.travb.wtf/" target="_blank" rel="noopener" class="group btn-cyber inline-flex items-center gap-3 px-8 py-4 rounded-2xl text-white font-medium text-sm hover:-translate-y-0.5 transition-all duration-300">
+                    <i data-lucide="search" class="w-4 h-4 text-purple-400"></i>
+                    Request Content
+                    <i data-lucide="arrow-up-right" class="w-4 h-4 text-white/40 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"></i>
+                </a>
+            </div>
+
+            <div class="mt-20 flex flex-col items-center gap-2 opacity-0 animate-fade-in-up-delay-3">
+                <span class="text-[10px] uppercase tracking-[0.2em] text-white/20">Scroll to explore</span>
+                <div class="w-5 h-8 rounded-full border border-white/10 flex items-start justify-center p-1">
+                    <div class="w-1 h-2 rounded-full bg-white/30 animate-bounce"></div>
+                </div>
             </div>
         </div>
-        <div class="accent">Open Jellyseerr →</div>
-    </a>
+    </section>
 
-</section>
+    <!-- Marquee Section -->
+    <div class="relative py-8 border-y border-white/[0.04] overflow-hidden">
+        <div class="marquee-track">
+            <div class="flex items-center gap-12 px-6">
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">Movies</span>
+                <span class="text-purple-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">TV Shows</span>
+                <span class="text-blue-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">Music</span>
+                <span class="text-cyan-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">Live TV</span>
+                <span class="text-pink-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">4K HDR</span>
+                <span class="text-purple-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">Subtitles</span>
+                <span class="text-blue-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">Requests</span>
+                <span class="text-cyan-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">No Ads</span>
+                <span class="text-pink-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">Offline Sync</span>
+                <span class="text-purple-500/20">◆</span>
+            </div>
+            <div class="flex items-center gap-12 px-6" aria-hidden="true">
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">Movies</span>
+                <span class="text-purple-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">TV Shows</span>
+                <span class="text-blue-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">Music</span>
+                <span class="text-cyan-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">Live TV</span>
+                <span class="text-pink-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">4K HDR</span>
+                <span class="text-purple-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">Subtitles</span>
+                <span class="text-blue-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">Requests</span>
+                <span class="text-cyan-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">No Ads</span>
+                <span class="text-pink-500/20">◆</span>
+                <span class="text-sm text-white/10 font-medium whitespace-nowrap tracking-wider uppercase">Offline Sync</span>
+                <span class="text-purple-500/20">◆</span>
+            </div>
+        </div>
+    </div>
 
-</main>
+    <!-- Services Section -->
+    <section id="services" class="relative py-24 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <span class="text-xs font-medium text-purple-400/80 tracking-[0.2em] uppercase mb-4 block">Services</span>
+                <h2 class="font-serif-display text-4xl md:text-5xl tracking-tight mb-4">
+                    Your <span class="italic text-gradient-cyan">Gateway</span>
+                </h2>
+                <p class="text-white/30 max-w-md mx-auto text-sm leading-relaxed">Access your media library and request new content through these services.</p>
+            </div>
 
-<script>
-/* ---------------------------------------------------------
-   SHARED-AXIS TRANSITION
---------------------------------------------------------- */
-(function () {
-    const body = document.body;
+            <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <a href="https://watch.travb.wtf/" target="_blank" rel="noopener" class="service-card glass rounded-3xl p-8 group cursor-pointer block reveal">
+                    <div class="scan-line rounded-3xl"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-start justify-between mb-8">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 border border-purple-500/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                                <svg class="w-7 h-7 text-purple-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                            </div>
+                            <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20" id="jellyfin-badge">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-dot"></span>
+                                <span class="text-[11px] text-emerald-400 font-medium">Online</span>
+                            </div>
+                        </div>
+                        <h3 class="font-serif-display text-2xl mb-2 group-hover:text-gradient-purple transition-all">Jellyfin</h3>
+                        <p class="text-white/30 text-sm leading-relaxed mb-6">Stream your entire media library. Movies, TV shows, music, and live TV — all in one place.</p>
+                        <div class="flex items-center gap-2 text-purple-400 text-sm font-medium">
+                            <span>Open Stream</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"></i>
+                        </div>
+                    </div>
+                </a>
 
-    function onReady() {
-        requestAnimationFrame(() => body.classList.add('page-entered'));
+                <a href="https://request.travb.wtf/" target="_blank" rel="noopener" class="service-card glass rounded-3xl p-8 group cursor-pointer block reveal" style="transition-delay: 0.1s;">
+                    <div class="scan-line rounded-3xl" style="animation-delay: 1.5s;"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-start justify-between mb-8">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 border border-cyan-500/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                                <i data-lucide="scan-search" class="w-7 h-7 text-cyan-400"></i>
+                            </div>
+                            <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20" id="seerr-badge">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-dot"></span>
+                                <span class="text-[11px] text-emerald-400 font-medium">Online</span>
+                            </div>
+                        </div>
+                        <h3 class="font-serif-display text-2xl mb-2">Seerr</h3>
+                        <p class="text-white/30 text-sm leading-relaxed mb-6">Search and request movies or shows. Get notified when your requests are ready to stream.</p>
+                        <div class="flex items-center gap-2 text-cyan-400 text-sm font-medium">
+                            <span>Make a Request</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
 
-        document.querySelectorAll('a.shared-axis-link').forEach(link => {
-            link.addEventListener('click', e => {
-                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
-                e.preventDefault();
-                const url = link.href;
-                body.classList.add('page-exit');
-                setTimeout(() => window.location.href = url, 220);
+    <!-- Features Section -->
+    <section id="features" class="relative py-24 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <span class="text-xs font-medium text-blue-400/80 tracking-[0.2em] uppercase mb-4 block">Why Self-Hosted</span>
+                <h2 class="font-serif-display text-4xl md:text-5xl tracking-tight mb-4">
+                    Built for <span class="italic text-gradient-purple">You</span>
+                </h2>
+                <p class="text-white/30 max-w-md mx-auto text-sm leading-relaxed">No subscriptions. No ads. No compromises. Just your media, your way.</p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
+                <div class="service-card glass rounded-2xl p-6 reveal">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/10 flex items-center justify-center mb-4">
+                        <i data-lucide="zap" class="w-5 h-5 text-purple-400"></i>
+                    </div>
+                    <h4 class="text-sm font-medium text-white/90 mb-2">Zero Buffering</h4>
+                    <p class="text-xs text-white/30 leading-relaxed">Direct streaming from your server with hardware transcoding support.</p>
+                </div>
+
+                <div class="service-card glass rounded-2xl p-6 reveal" style="transition-delay: 0.05s;">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/10 flex items-center justify-center mb-4">
+                        <i data-lucide="shield-check" class="w-5 h-5 text-blue-400"></i>
+                    </div>
+                    <h4 class="text-sm font-medium text-white/90 mb-2">Complete Privacy</h4>
+                    <p class="text-xs text-white/30 leading-relaxed">No tracking, no data collection. Your viewing habits stay private.</p>
+                </div>
+
+                <div class="service-card glass rounded-2xl p-6 reveal" style="transition-delay: 0.1s;">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/10 flex items-center justify-center mb-4">
+                        <i data-lucide="monitor-smartphone" class="w-5 h-5 text-cyan-400"></i>
+                    </div>
+                    <h4 class="text-sm font-medium text-white/90 mb-2">Watch Anywhere</h4>
+                    <p class="text-xs text-white/30 leading-relaxed">Apps for every platform — iOS, Android, web, TV, and more.</p>
+                </div>
+
+                <div class="service-card glass rounded-2xl p-6 reveal" style="transition-delay: 0.15s;">
+                    <div class="w-10 h-10 rounded-xl bg-pink-500/10 border border-pink-500/10 flex items-center justify-center mb-4">
+                        <i data-lucide="sparkles" class="w-5 h-5 text-pink-400"></i>
+                    </div>
+                    <h4 class="text-sm font-medium text-white/90 mb-2">4K & HDR</h4>
+                    <p class="text-xs text-white/30 leading-relaxed">Full support for ultra-high-definition content with HDR pass-through.</p>
+                </div>
+
+                <div class="service-card glass rounded-2xl p-6 reveal" style="transition-delay: 0.2s;">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/10 flex items-center justify-center mb-4">
+                        <i data-lucide="bell-ring" class="w-5 h-5 text-emerald-400"></i>
+                    </div>
+                    <h4 class="text-sm font-medium text-white/90 mb-2">Smart Requests</h4>
+                    <p class="text-xs text-white/30 leading-relaxed">Request content through Seerr and get notified when it's available.</p>
+                </div>
+
+                <div class="service-card glass rounded-2xl p-6 reveal" style="transition-delay: 0.25s;">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/10 flex items-center justify-center mb-4">
+                        <i data-lucide="subtitles" class="w-5 h-5 text-amber-400"></i>
+                    </div>
+                    <h4 class="text-sm font-medium text-white/90 mb-2">Auto Subtitles</h4>
+                    <p class="text-xs text-white/30 leading-relaxed">OpenSubtitles integration for automatic subtitle downloads.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats / Status Section -->
+    <section id="status" class="relative py-24 px-6">
+        <div class="max-w-5xl mx-auto">
+            <div class="glass-strong rounded-3xl p-8 md:p-12 glow-purple reveal">
+                <div class="scan-line rounded-3xl"></div>
+                <div class="relative z-10">
+                    <div class="flex flex-col md:flex-row md:items-end justify-between mb-10">
+                        <div>
+                            <span class="text-xs font-medium text-purple-400/80 tracking-[0.2em] uppercase mb-3 block">System Status</span>
+                            <h2 class="font-serif-display text-3xl md:text-4xl tracking-tight">
+                                Server <span class="italic text-gradient-cyan">Overview</span>
+                            </h2>
+                        </div>
+                        <div class="flex items-center gap-2 mt-4 md:mt-0 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20" id="overall-status">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 status-dot"></span>
+                            <span class="text-xs text-emerald-400 font-medium">Operational</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+                        <div class="text-center md:text-left">
+                            <div class="text-3xl md:text-4xl font-serif-display text-gradient-purple mb-1" id="stat-movies">—</div>
+                            <div class="text-xs text-white/30 uppercase tracking-wider">Movies</div>
+                        </div>
+                        <div class="text-center md:text-left">
+                            <div class="text-3xl md:text-4xl font-serif-display text-gradient-cyan mb-1" id="stat-shows">—</div>
+                            <div class="text-xs text-white/30 uppercase tracking-wider">TV Shows</div>
+                        </div>
+                        <div class="text-center md:text-left">
+                            <div class="text-3xl md:text-4xl font-serif-display text-gradient-shimmer mb-1" id="stat-episodes">—</div>
+                            <div class="text-xs text-white/30 uppercase tracking-wider">Episodes</div>
+                        </div>
+                        <div class="text-center md:text-left">
+                            <div class="text-3xl md:text-4xl font-serif-display text-white/80 mb-1" id="stat-music">—</div>
+                            <div class="text-xs text-white/30 uppercase tracking-wider">Songs</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:border-purple-500/20 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-white/80">Jellyfin</div>
+                                    <div class="text-[11px] text-white/25">watch.travb.wtf</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2" id="jellyfin-status-row">
+                                <span class="text-xs text-emerald-400/60 hidden sm:block">Running</span>
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 status-dot"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:border-cyan-500/20 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                                    <i data-lucide="scan-search" class="w-4 h-4 text-cyan-400"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-white/80">Seerr</div>
+                                    <div class="text-[11px] text-white/25">request.travb.wtf</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2" id="seerr-status-row">
+                                <span class="text-xs text-emerald-400/60 hidden sm:block">Running</span>
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 status-dot"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:border-blue-500/20 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                                    <i data-lucide="hard-drive" class="w-4 h-4 text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-white/80">Storage</div>
+                                    <div class="text-[11px] text-white/25">Media Library</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-white/30 hidden sm:block" id="storage-text">Calculating…</span>
+                                <div class="w-16 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                                    <div class="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-1000" id="storage-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Access Section -->
+    <section class="relative py-16 px-6">
+        <div class="max-w-4xl mx-auto text-center reveal">
+            <h2 class="font-serif-display text-3xl md:text-4xl tracking-tight mb-4">
+                Quick <span class="italic text-gradient-purple">Access</span>
+            </h2>
+            <p class="text-white/30 text-sm mb-10">Launch your preferred client or access the web interface.</p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <a href="https://watch.travb.wtf/" target="_blank" rel="noopener" class="group glass rounded-2xl p-5 hover:border-purple-500/20 transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-500/10 transition-colors">
+                        <i data-lucide="globe" class="w-5 h-5 text-white/40 group-hover:text-purple-400 transition-colors"></i>
+                    </div>
+                    <div class="text-xs text-white/50 group-hover:text-white/80 transition-colors">Web App</div>
+                </a>
+                <a href="#" class="group glass rounded-2xl p-5 hover:border-blue-500/20 transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-500/10 transition-colors">
+                        <i data-lucide="smartphone" class="w-5 h-5 text-white/40 group-hover:text-blue-400 transition-colors"></i>
+                    </div>
+                    <div class="text-xs text-white/50 group-hover:text-white/80 transition-colors">iOS / Android</div>
+                </a>
+                <a href="#" class="group glass rounded-2xl p-5 hover:border-cyan-500/20 transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center mx-auto mb-3 group-hover:bg-cyan-500/10 transition-colors">
+                        <i data-lucide="tv" class="w-5 h-5 text-white/40 group-hover:text-cyan-400 transition-colors"></i>
+                    </div>
+                    <div class="text-xs text-white/50 group-hover:text-white/80 transition-colors">Smart TV</div>
+                </a>
+                <a href="https://request.travb.wtf/" target="_blank" rel="noopener" class="group glass rounded-2xl p-5 hover:border-pink-500/20 transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center mx-auto mb-3 group-hover:bg-pink-500/10 transition-colors">
+                        <i data-lucide="plus-circle" class="w-5 h-5 text-white/40 group-hover:text-pink-400 transition-colors"></i>
+                    </div>
+                    <div class="text-xs text-white/50 group-hover:text-white/80 transition-colors">Request</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative border-t border-white/[0.04] py-12 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+                    <i data-lucide="play" class="w-3 h-3 text-white fill-white"></i>
+                </div>
+                <span class="text-sm text-white/40">MediaVault</span>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="https://watch.travb.wtf/" target="_blank" rel="noopener" class="text-xs text-white/25 hover:text-white/60 transition-colors">Jellyfin</a>
+                <a href="https://request.travb.wtf/" target="_blank" rel="noopener" class="text-xs text-white/25 hover:text-white/60 transition-colors">Seerr</a>
+                <a href="https://jellyfin.org" target="_blank" rel="noopener" class="text-xs text-white/25 hover:text-white/60 transition-colors">Jellyfin.org</a>
+            </div>
+            <div class="text-xs text-white/15">
+                Hosted on GitHub Pages
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Mobile menu toggle
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+        });
+
+        // Generate data stream particles
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'data-particle';
+            particle.style.setProperty('--left', Math.random() * 100 + '%');
+            particle.style.setProperty('--duration', (3 + Math.random() * 4) + 's');
+            particle.style.setProperty('--delay', Math.random() * 5 + 's');
+            if (Math.random() > 0.5) {
+                particle.style.background = 'linear-gradient(to bottom, transparent, rgba(59, 130, 246, 0.4), transparent)';
+            }
+            particleContainer.appendChild(particle);
+        }
+
+        // Scroll reveal
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // ===== SERVER CONFIG =====
+        const CONFIG = {
+            jellyfinUrl: 'https://watch.travb.wtf',
+            seerrUrl: 'https://request.travb.wtf',
+            jellyfinApiKey: '0c187ef1f38648579f426ddce24d0bee',
+            // Fallback values if API is unreachable
+            fallbackMovies: 0,
+            fallbackShows: 0,
+            fallbackEpisodes: 0,
+            fallbackSongs: 0,
+            fallbackStorage: '—',
+            fallbackStoragePercent: 0,
+        };
+
+        // Counter animation
+        function animateCounter(id, target) {
+            const el = document.getElementById(id);
+            const duration = 1500;
+            const start = performance.now();
+            function update(now) {
+                const progress = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                el.textContent = Math.floor(eased * target).toLocaleString();
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        function setStats(movies, shows, episodes, music) {
+            animateCounter('stat-movies', movies);
+            animateCounter('stat-shows', shows);
+            animateCounter('stat-episodes', episodes);
+            animateCounter('stat-music', music);
+        }
+
+        function setStorage(text, percent) {
+            document.getElementById('storage-bar').style.width = percent + '%';
+            document.getElementById('storage-text').textContent = text;
+        }
+
+        // Update status badge (green/red)
+        function setStatusBadge(elementId, isOnline) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            const dot = el.querySelector('.status-dot, .w-2');
+            const text = el.querySelector('span:last-child');
+            if (isOnline) {
+                el.className = el.className.replace(/bg-red-500\/10|border-red-500\/20|bg-emerald-500\/10|border-emerald-500\/20/g, '');
+                el.classList.add('bg-emerald-500/10', 'border-emerald-500/20');
+                if (dot) { dot.classList.remove('bg-red-400'); dot.classList.add('bg-emerald-400'); }
+                if (text) { text.classList.remove('text-red-400'); text.classList.add('text-emerald-400'); }
+                if (text && text.textContent !== 'Online' && text.textContent !== 'Running') text.textContent = text.textContent.includes('Online') ? 'Online' : 'Running';
+            } else {
+                el.className = el.className.replace(/bg-emerald-500\/10|border-emerald-500\/20|bg-red-500\/10|border-red-500\/20/g, '');
+                el.classList.add('bg-red-500/10', 'border-red-500/20');
+                if (dot) { dot.classList.remove('bg-emerald-400'); dot.classList.add('bg-red-400'); }
+                if (text) { text.classList.remove('text-emerald-400'); text.classList.add('text-red-400'); }
+                if (text && text.textContent !== 'Offline' && text.textContent !== 'Down') text.textContent = text.textContent.includes('Online') ? 'Offline' : 'Down';
+            }
+        }
+
+        function setStatusRow(rowId, isOnline) {
+            const row = document.getElementById(rowId);
+            if (!row) return;
+            const dot = row.querySelector('.w-2');
+            const text = row.querySelector('span.text-xs');
+            if (isOnline) {
+                if (dot) { dot.classList.remove('bg-red-400'); dot.classList.add('bg-emerald-400'); }
+                if (text) { text.classList.remove('text-red-400/60'); text.classList.add('text-emerald-400/60'); text.textContent = 'Running'; }
+            } else {
+                if (dot) { dot.classList.remove('bg-emerald-400'); dot.classList.add('bg-red-400'); }
+                if (text) { text.classList.remove('text-emerald-400/60'); text.classList.add('text-red-400/60'); text.textContent = 'Down'; }
+            }
+        }
+
+        // Check service health
+        async function checkService(url, timeoutMs = 5000) {
+            try {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), timeoutMs);
+                const res = await fetch(url, { method: 'HEAD', mode: 'no-cors', signal: controller.signal });
+                clearTimeout(timer);
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        // Fetch Jellyfin item counts
+        async function fetchJellyfinStats() {
+            try {
+                const res = await fetch(`${CONFIG.jellyfinUrl}/Items/Counts`, {
+                    headers: { 'X-Emby-Token': CONFIG.jellyfinApiKey }
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                setStats(
+                    data.MovieCount || 0,
+                    data.SeriesCount || 0,
+                    data.EpisodeCount || 0,
+                    data.SongCount || 0
+                );
+                return true;
+            } catch (e) {
+                console.warn('Jellyfin API fetch failed:', e.message);
+                setStats(CONFIG.fallbackMovies, CONFIG.fallbackShows, CONFIG.fallbackEpisodes, CONFIG.fallbackSongs);
+                return false;
+            }
+        }
+
+        // Main init for status section
+        let statsFetched = false;
+        const statusSection = document.getElementById('status');
+        const statsObserver = new IntersectionObserver(async (entries) => {
+            entries.forEach(async (entry) => {
+                if (entry.isIntersecting && !statsFetched) {
+                    statsFetched = true;
+
+                    // Check Jellyfin
+                    const jellyfinUp = await checkService(CONFIG.jellyfinUrl);
+                    setStatusBadge('jellyfin-badge', jellyfinUp);
+                    setStatusRow('jellyfin-status-row', jellyfinUp);
+
+                    // Check Seerr
+                    const seerrUp = await checkService(CONFIG.seerrUrl);
+                    setStatusBadge('seerr-badge', seerrUp);
+                    setStatusRow('seerr-status-row', seerrUp);
+
+                    // Update nav status
+                    const navStatus = document.getElementById('nav-status');
+                    if (jellyfinUp && seerrUp) {
+                        navStatus.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-dot"></span>All Systems Online';
+                        navStatus.classList.remove('text-red-400');
+                        navStatus.classList.add('text-emerald-400');
+                    } else {
+                        navStatus.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-400 status-dot"></span>Partial Outage';
+                        navStatus.classList.remove('text-emerald-400');
+                        navStatus.classList.add('text-red-400');
+                    }
+
+                    // Overall status
+                    const overallStatus = document.getElementById('overall-status');
+                    if (jellyfinUp && seerrUp) {
+                        overallStatus.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 status-dot"></span><span class="text-xs text-emerald-400 font-medium">Operational</span>';
+                        overallStatus.className = 'flex items-center gap-2 mt-4 md:mt-0 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20';
+                    } else {
+                        overallStatus.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400 status-dot"></span><span class="text-xs text-amber-400 font-medium">Degraded</span>';
+                        overallStatus.className = 'flex items-center gap-2 mt-4 md:mt-0 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20';
+                    }
+
+                    // Fetch stats via API
+                    if (jellyfinUp) {
+                        await fetchJellyfinStats();
+                    } else {
+                        setStats(CONFIG.fallbackMovies, CONFIG.fallbackShows, CONFIG.fallbackEpisodes, CONFIG.fallbackSongs);
+                    }
+
+                    setStorage(CONFIG.fallbackStorage, CONFIG.fallbackStoragePercent);
+                }
+            });
+        }, { threshold: 0.2 });
+        statsObserver.observe(statusSection);
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href.startsWith('#') && href.length > 1 && document.querySelector(href)) {
+                    e.preventDefault();
+                    document.querySelector(href).scrollIntoView({ behavior: 'smooth' });
+                }
             });
         });
-    }
 
-    document.readyState === 'loading'
-        ? document.addEventListener('DOMContentLoaded', onReady)
-        : onReady();
-})();
-</script>
-
+        // Navbar background on scroll
+        const nav = document.querySelector('nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.style.background = 'rgba(5, 5, 8, 0.8)';
+                nav.style.backdropFilter = 'blur(20px)';
+                nav.style.borderBottom = '1px solid rgba(255,255,255,0.04)';
+            } else {
+                nav.style.background = 'transparent';
+                nav.style.backdropFilter = 'none';
+                nav.style.borderBottom = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
